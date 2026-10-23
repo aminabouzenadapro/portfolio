@@ -1,0 +1,92 @@
+{
+ "iphone-15": {
+  "source": "https://commons.wikimedia.org/wiki/File:IPhone_(Plus).jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Ka Kit Pang"
+ },
+ "galaxy-a55": {
+  "source": "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_A55_5G_2024.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Captainmorlypogi1959"
+ },
+ "macbook-air": {
+  "source": "https://commons.wikimedia.org/wiki/File:M2_Macbook_Air_Starlight_model.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "KKPCW（Kyu3）"
+ },
+ "lenovo-ideapad": {
+  "source": "https://commons.wikimedia.org/wiki/File:Lenovo_IdeaPad_Flex14_laptop.jpg",
+  "license": "CC0",
+  "author": "Info-farmer"
+ },
+ "hp-laptop": {
+  "source": "https://commons.wikimedia.org/wiki/File:HP_Pavilion_dv2000_laptop.jpg",
+  "license": "CC BY 2.0",
+  "author": "Aaron Patterson from Redding CA"
+ },
+ "ipad": {
+  "source": "https://commons.wikimedia.org/wiki/File:Ipadtenthgen.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Wiikiipediia"
+ },
+ "headphones": {
+  "source": "https://commons.wikimedia.org/wiki/File:Sony-WH-1000XM3-kabellose-Bluetooth-Noise-Cancelling-Kopfhoerer.3.jpg",
+  "license": "CC BY 4.0",
+  "author": "www.digitalpush.net"
+ },
+ "airpods-pro": {
+  "source": "https://commons.wikimedia.org/wiki/File:AirPods_Pro_(2nd_generation).jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Hajoon0102"
+ },
+ "jbl-flip": {
+  "source": "https://commons.wikimedia.org/wiki/File:G%C5%82o%C5%9Bnik_JBL_Flip_3.jpg",
+  "license": "CC BY-SA 3.0",
+  "author": "Przemek Pietrak"
+ },
+ "apple-watch": {
+  "source": "https://commons.wikimedia.org/wiki/File:Watch_SE_(2nd_generation).jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "茅野ふたば"
+ },
+ "mi-band": {
+  "source": "https://commons.wikimedia.org/wiki/File:Mi_Band_6_default_face.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "人工知能"
+ },
+ "ps5": {
+  "source": "https://commons.wikimedia.org/wiki/File:Immagine_Playstation_5.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Gianlupisa1"
+ },
+ "dualsense": {
+  "source": "https://commons.wikimedia.org/wiki/File:Playstation_DualSense_Controller.png",
+  "license": "CC BY-SA 4.0",
+  "author": "Alex Cochrane"
+ },
+ "keyboard": {
+  "source": "https://commons.wikimedia.org/wiki/File:Mechanical_keyboard_example.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Thanasis Termitzoglou"
+ },
+ "mouse": {
+  "source": "https://commons.wikimedia.org/wiki/File:Logitech_MX_Master_3S_HS11.jpg",
+  "license": "CC BY 4.0",
+  "author": "Hayden Schiff"
+ },
+ "powerbank": {
+  "source": "https://commons.wikimedia.org/wiki/File:Anker_power_bank_and_cable.jpg",
+  "license": "CC BY 4.0",
+  "author": "Saucy"
+ },
+ "charger": {
+  "source": "https://commons.wikimedia.org/wiki/File:Silicon_vs_GaN_30W_USB-C_chargers.jpg",
+  "license": "CC BY 4.0",
+  "author": "4300streetcar"
+ },
+ "redmi-note-11": {
+  "source": "https://commons.wikimedia.org/wiki/File:Redmi_Note_11_front.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Maksdroider"
+ }
+}
