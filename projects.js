@@ -12,7 +12,7 @@ const PROFILE = {
   status: "Open to new opportunities",   // "" hides the green badge
   avatar: "",                            // e.g. "images/me.jpg" ("" shows your initials)
   email: "amina.bouzenada.pro@gmail.com",
-  resume: "",                            // e.g. "resume.pdf" ("" hides the Download CV button)
+  resume: "Amina-Bouzenada-CV.pdf",      // e.g. "resume.pdf" ("" hides the Download CV button)
   // One string per paragraph
   about: [
     "I'm a full-stack developer based in Constantine, Algeria. I build complete products: responsive web apps with React, mobile apps with Flutter, and the APIs and databases behind them with Node.js, PHP and Python.",
