@@ -25,7 +25,7 @@ const PROFILE = {
     { label: "Languages", value: "English, French" },
   ],
   socials: [
-    { label: "GitHub", url: "https://github.com/yourname" },
+    { label: "GitHub", url: "https://github.com/AminaBouzenada" },
     { label: "LinkedIn", url: "https://linkedin.com/in/yourname" },
   ],
 };
@@ -65,7 +65,7 @@ const PROJECTS = [
     image: "images/dzair-tech.jpg",
     url: "dzair-tech.dz",
     color: "#1d4ed8",
-    github: "",
+    github: "https://github.com/AminaBouzenada/portfolio/tree/main/projects/shop",
     demo: "projects/shop/dist/",
     featured: true,
   },
