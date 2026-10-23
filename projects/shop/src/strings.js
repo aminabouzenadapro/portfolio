@@ -195,6 +195,7 @@ export const STRINGS = {
     spec_capacity: "Capacité",
     spec_power: "Puissance",
     adminLink: "Espace administrateur",
+    adminShort: "Admin",
   },
   ar: {
     announce: "التوصيل إلى 58 ولاية · الدفع عند الاستلام · ضمان 12 شهرا · توصيل مجاني ابتداءً من {amount}",
@@ -389,5 +390,6 @@ export const STRINGS = {
     spec_capacity: "السعة",
     spec_power: "القدرة",
     adminLink: "لوحة الإدارة",
+    adminShort: "الإدارة",
   },
 };

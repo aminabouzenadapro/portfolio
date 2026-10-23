@@ -1,4 +1,5 @@
-// Renders the content defined in projects.js. You normally don't need to edit this file.
+// Renders the content defined in projects.js in the chosen language (see i18n.js).
+// You normally don't need to edit this file.
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -14,35 +15,59 @@ const initials = (t = "") => t.split(/\s+/).filter(Boolean).slice(0, 2).map((w) 
 const ICON = {
   ext: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>`,
   code: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>`,
+  grid: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
 };
+
+/* ---------- Language ---------- */
+// Fixed texts in index.html carry data-i18n (text) or data-i18n-aria (aria-label)
+function applyStaticTexts() {
+  const html = document.documentElement;
+  html.lang = LANG;
+  html.dir = LANG === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+}
+
+function renderLangSwitch() {
+  $("#lang-switch").innerHTML = LANGUAGES.map((l) =>
+    `<button type="button" lang="${l.code}" aria-pressed="${l.code === LANG}" title="${esc(l.name)}" data-lang="${l.code}">${esc(l.label)}</button>`
+  ).join("");
+}
+
+function setLanguage(code) {
+  if (code === LANG) return;
+  LANG = code;
+  try { localStorage.setItem("portfolio-lang", code); } catch (e) {}
+  renderAll();
+}
 
 /* ---------- Profile ---------- */
 function renderProfile() {
   const p = PROFILE;
-  document.title = `${p.name} — ${p.role}`;
+  document.title = `${p.name} — ${tx(p.role)}`;
   // *text* in the headline gets the gradient highlight
-  $("#headline").innerHTML = esc(p.headline).replace(/\*(.+?)\*/g, '<span class="grad">$1</span>');
-  $("#tagline").textContent = p.tagline;
-  if (p.status) $("#status-text").textContent = p.status;
-  else $("#status").remove();
+  $("#headline").innerHTML = esc(tx(p.headline)).replace(/\*(.+?)\*/g, '<span class="grad">$1</span>');
+  $("#tagline").textContent = tx(p.tagline);
+  if (p.status) $("#status-text").textContent = tx(p.status);
+  else $("#status")?.remove();
 
   $("#brand-mark").textContent = initials(p.name);
   $("#brand-name").textContent = p.name;
   $("#footer-name").textContent = p.name;
   $("#about-name").textContent = p.name;
-  $("#about-role").textContent = p.role;
+  $("#about-role").textContent = tx(p.role);
   $("#avatar").innerHTML = p.avatar ? `<img src="${esc(safeUrl(p.avatar))}" alt="${esc(p.name)}" />` : esc(initials(p.name));
-  $("#about-text").innerHTML = [].concat(p.about).map((t) => `<p>${esc(t)}</p>`).join("");
-  $("#facts").innerHTML = (p.facts || []).map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join("");
+  $("#about-text").innerHTML = [].concat(tx(p.about)).map((s) => `<p>${esc(s)}</p>`).join("");
+  $("#facts").innerHTML = (p.facts || []).map((f) => `<div><dt>${esc(tx(f.label))}</dt><dd>${esc(tx(f.value))}</dd></div>`).join("");
 
   $("#email-link").href = `mailto:${p.email}`;
   // Hide the CV button until a resume file is set
   if (p.resume) $("#cv-btn").href = p.resume;
-  else $("#cv-btn").remove();
+  else $("#cv-btn")?.remove();
   $("#copy-label").textContent = p.email;
   $("#year").textContent = new Date().getFullYear();
   $("#socials").innerHTML = p.socials
-    .map((s) => `<li><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ${ICON.ext}</a></li>`)
+    .map((s) => `<li><a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer">${esc(tx(s.label))} ${ICON.ext}</a></li>`)
     .join("");
 }
 
@@ -50,30 +75,36 @@ function renderProfile() {
 // Screenshot (or a generated app mockup) inside a browser frame
 function visual(p) {
   const inner = p.image
-    ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(p.title)} screenshot" loading="lazy" />`
+    ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(t("screenshot", { name: tx(p.title) }))}" loading="lazy" />`
     : `<div class="mock" aria-hidden="true">
          <div class="mock-side"><b></b><b></b><b></b><b></b><b></b></div>
          <div class="mock-main">
            <div class="mock-head"><b></b><b></b></div>
-           <div class="mock-hero">${esc(p.title)}</div>
+           <div class="mock-hero">${esc(tx(p.title))}</div>
            <div class="mock-cards"><b></b><b></b><b></b></div>
          </div>
        </div>`;
   return `
     <div class="visual" style="--c:${safeColor(p.color)}">
-      <div class="browser">
+      <div class="browser" dir="ltr">
         <div class="browser-bar"><i></i><i></i><i></i>${p.url ? `<span>${esc(p.url)}</span>` : ""}</div>
         ${inner}
       </div>
     </div>`;
 }
 
-const tagList = (tags = []) => `<ul class="tags">${tags.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`;
+const tagList = (tags = []) => `<ul class="tags">${tags.map((tag) => `<li>${esc(tx(tag))}</li>`).join("")}</ul>`;
+
+// Extra links on a project, e.g. { label: { en, fr, ar }, url }
+const extraLinks = (p, cls) => (p.links || [])
+  .map((l) => `<a class="${cls}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">${ICON.grid} ${esc(tx(l.label))}</a>`)
+  .join("");
 
 function projectLinks(p) {
   return [
-    p.demo && `<a class="link" href="${esc(safeUrl(p.demo))}" target="_blank" rel="noopener noreferrer">Live site ${ICON.ext}</a>`,
-    p.github && `<a class="link link-muted" href="${esc(safeUrl(p.github))}" target="_blank" rel="noopener noreferrer">${ICON.code} Source</a>`,
+    p.demo && `<a class="link" href="${esc(safeUrl(p.demo))}" target="_blank" rel="noopener noreferrer">${esc(t("live_site"))} ${ICON.ext}</a>`,
+    extraLinks(p, "link"),
+    p.github && `<a class="link link-muted" href="${esc(safeUrl(p.github))}" target="_blank" rel="noopener noreferrer">${ICON.code} ${esc(t("source"))}</a>`,
   ].filter(Boolean).join("");
 }
 
@@ -81,13 +112,13 @@ function projectLinks(p) {
 function renderFeatured() {
   const list = PROJECTS.map((p, i) => ({ p, i })).filter(({ p }) => p.featured);
   $("#featured").innerHTML = list.map(({ p, i }, n) => `
-    <article class="feature reveal${n % 2 ? " flip" : ""}" data-index="${i}" tabindex="0" role="button" aria-label="View details for ${esc(p.title)}">
+    <article class="feature reveal${n % 2 ? " flip" : ""}" data-index="${i}" tabindex="0" role="button" aria-label="${esc(t("view_details", { name: tx(p.title) }))}">
       <div class="feature-text">
-        <div class="feature-meta"><span class="cat">${esc(p.category)}</span><span>${esc(p.year || "")}</span></div>
-        <h3>${esc(p.title)}</h3>
-        <p>${esc(p.summary)}</p>
+        <div class="feature-meta"><span class="cat">${esc(tx(p.category))}</span><span>${esc(p.year || "")}</span></div>
+        <h3>${esc(tx(p.title))}</h3>
+        <p>${esc(tx(p.summary))}</p>
         ${tagList(p.tags)}
-        <div class="feature-links">${projectLinks(p)}<span class="link link-muted">Details →</span></div>
+        <div class="feature-links">${projectLinks(p)}<span class="link link-muted">${esc(t("details"))}</span></div>
       </div>
       ${visual(p)}
     </article>`).join("");
@@ -95,58 +126,56 @@ function renderFeatured() {
 
 /* ---------- More projects ---------- */
 const others = () => PROJECTS.map((p, i) => ({ p, i })).filter(({ p }) => !p.featured);
+let currentFilter = "";
 
-function renderGrid(filter = "All") {
-  const list = others().filter(({ p }) => filter === "All" || p.category === filter);
+function renderGrid() {
+  const list = others().filter(({ p }) => !currentFilter || tx(p.category) === currentFilter);
   $("#grid").innerHTML = list.map(({ p, i }) => `
-    <article class="card reveal" data-index="${i}" tabindex="0" role="button" aria-label="View details for ${esc(p.title)}">
+    <article class="card reveal" data-index="${i}" tabindex="0" role="button" aria-label="${esc(t("view_details", { name: tx(p.title) }))}">
       ${visual(p)}
       <div class="card-body">
-        <div class="card-top"><span class="cat">${esc(p.category)}</span><span class="card-year">${esc(p.year || "")}</span></div>
-        <h4>${esc(p.title)} ${ICON.ext}</h4>
-        <p>${esc(p.summary)}</p>
+        <div class="card-top"><span class="cat">${esc(tx(p.category))}</span><span class="card-year">${esc(p.year || "")}</span></div>
+        <h4>${esc(tx(p.title))} ${ICON.ext}</h4>
+        <p>${esc(tx(p.summary))}</p>
         ${tagList((p.tags || []).slice(0, 3))}
       </div>
     </article>`).join("");
   $("#empty").hidden = list.length > 0 || others().length === 0; // no message when there are no extra projects at all
-  observeReveals();
 }
 
 function renderFilters() {
-  if (!others().length) { $("#more-head").remove(); return; }
-  const cats = ["All", ...new Set(others().map(({ p }) => p.category))];
+  const head = $("#more-head");
+  if (!head) return;
+  if (!others().length) { head.hidden = true; return; }
+  const cats = [...new Set(others().map(({ p }) => tx(p.category)))];
   const box = $("#filters");
-  if (cats.length <= 2) { box.remove(); return; } // tabs aren't useful with one category
-  box.innerHTML = cats
-    .map((c, i) => `<button class="tab" role="tab" aria-selected="${i === 0}" data-cat="${esc(c)}">${esc(c)}</button>`)
+  if (cats.length < 2) { box.hidden = true; return; } // tabs aren't useful with one category
+  if (!cats.includes(currentFilter)) currentFilter = "";
+  box.innerHTML = ["", ...cats]
+    .map((c) => `<button class="tab" role="tab" aria-selected="${c === currentFilter}" data-cat="${esc(c)}">${esc(c || t("filter_all"))}</button>`)
     .join("");
-  box.addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab");
-    if (!btn) return;
-    box.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", b === btn));
-    renderGrid(btn.dataset.cat);
-  });
 }
 
 /* ---------- Project modal ---------- */
 function openProject(i) {
   const p = PROJECTS[i];
-  const paras = [].concat(p.description || []).map((t) => `<p>${esc(t)}</p>`).join("");
+  const paras = [].concat(tx(p.description) || []).map((s) => `<p>${esc(s)}</p>`).join("");
   const links = [
-    p.demo && `<a class="btn btn-primary" href="${esc(safeUrl(p.demo))}" target="_blank" rel="noopener noreferrer">Visit live site ${ICON.ext}</a>`,
-    p.github && `<a class="btn btn-secondary" href="${esc(safeUrl(p.github))}" target="_blank" rel="noopener noreferrer">${ICON.code} View source</a>`,
+    p.demo && `<a class="btn btn-primary" href="${esc(safeUrl(p.demo))}" target="_blank" rel="noopener noreferrer">${esc(t("visit_live"))} ${ICON.ext}</a>`,
+    extraLinks(p, "btn btn-secondary"),
+    p.github && `<a class="btn btn-secondary" href="${esc(safeUrl(p.github))}" target="_blank" rel="noopener noreferrer">${ICON.code} ${esc(t("view_source"))}</a>`,
   ].filter(Boolean).join("");
   $("#modal-content").innerHTML = `
     ${visual(p)}
     <div class="modal-body">
-      <span class="cat">${esc(p.category)}</span>
-      <h3 id="modal-title">${esc(p.title)}</h3>
-      <p class="modal-sub">${esc(p.summary)}</p>
+      <span class="cat">${esc(tx(p.category))}</span>
+      <h3 id="modal-title">${esc(tx(p.title))}</h3>
+      <p class="modal-sub">${esc(tx(p.summary))}</p>
       ${paras ? `<div class="modal-desc">${paras}</div>` : ""}
       <dl class="modal-facts">
-        <div><dt>Role</dt><dd>${esc(p.role || "—")}</dd></div>
-        <div><dt>Year</dt><dd>${esc(p.year || "—")}</dd></div>
-        <div><dt>Type</dt><dd>${esc(p.category)}</dd></div>
+        <div><dt>${esc(t("role"))}</dt><dd>${esc(tx(p.role) || "—")}</dd></div>
+        <div><dt>${esc(t("year"))}</dt><dd>${esc(p.year || "—")}</dd></div>
+        <div><dt>${esc(t("type"))}</dt><dd>${esc(tx(p.category))}</dd></div>
       </dl>
       ${tagList(p.tags)}
       ${links ? `<div class="modal-links">${links}</div>` : ""}
@@ -154,7 +183,68 @@ function openProject(i) {
   $("#modal").showModal();
 }
 
-function setupModal() {
+/* ---------- Skills & experience ---------- */
+function renderSkills() {
+  $("#skills").innerHTML = SKILLS.map(
+    (s) => `<div><h4>${esc(tx(s.group))}</h4><ul>${s.items.map((i) => `<li>${esc(tx(i))}</li>`).join("")}</ul></div>`
+  ).join("");
+  // Top few from each group for the hero row
+  $("#stack").innerHTML = SKILLS.flatMap((s) => s.items.slice(0, 3)).map((i) => `<li>${esc(tx(i))}</li>`).join("");
+}
+
+function renderTimeline() {
+  $("#timeline").innerHTML = TIMELINE.map(
+    (item) => `
+      <li class="tl reveal">
+        <div class="tl-head"><h3>${esc(tx(item.title))}</h3><span class="tl-when">${esc(tx(item.when))}</span></div>
+        <div class="tl-where">${esc(tx(item.where))}</div>
+        <p>${esc(tx(item.text))}</p>
+      </li>`
+  ).join("");
+}
+
+// Draws (or redraws, after a language change) everything that has text
+function renderAll() {
+  applyStaticTexts();
+  renderLangSwitch();
+  renderProfile();
+  renderFeatured();
+  renderFilters();
+  renderGrid();
+  renderSkills();
+  renderTimeline();
+  observeReveals();
+}
+
+/* ---------- UI behavior (set up once) ---------- */
+let observer;
+function observeReveals() {
+  if (!("IntersectionObserver" in window)) {
+    document.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
+    return;
+  }
+  observer ??= new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("visible"), observer.unobserve(e.target))),
+    { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+  );
+  document.querySelectorAll(".reveal:not(.visible)").forEach((el) => observer.observe(el));
+}
+
+function setupEvents() {
+  $("#lang-switch").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-lang]");
+    if (btn) setLanguage(btn.dataset.lang);
+  });
+
+  $("#filters").addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab");
+    if (!btn) return;
+    currentFilter = btn.dataset.cat;
+    renderFilters();
+    renderGrid();
+    observeReveals();
+  });
+
   const modal = $("#modal");
   const work = $("#work");
   work.addEventListener("click", (e) => {
@@ -169,49 +259,25 @@ function setupModal() {
   $("#modal-close").addEventListener("click", () => modal.close());
   // Close when clicking the backdrop
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.close(); });
-}
 
-/* ---------- Skills & experience ---------- */
-function renderSkills() {
-  $("#skills").innerHTML = SKILLS.map(
-    (s) => `<div><h4>${esc(s.group)}</h4><ul>${s.items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>`
-  ).join("");
-  // Top few from each group for the hero row
-  $("#stack").innerHTML = SKILLS.flatMap((s) => s.items.slice(0, 3)).map((i) => `<li>${esc(i)}</li>`).join("");
-}
-
-function renderTimeline() {
-  $("#timeline").innerHTML = TIMELINE.map(
-    (t) => `
-      <li class="tl reveal">
-        <div class="tl-head"><h3>${esc(t.title)}</h3><span class="tl-when">${esc(t.when)}</span></div>
-        <div class="tl-where">${esc(t.where)}</div>
-        <p>${esc(t.text)}</p>
-      </li>`
-  ).join("");
-}
-
-/* ---------- UI behavior ---------- */
-let observer;
-function observeReveals() {
-  if (!("IntersectionObserver" in window)) {
-    document.querySelectorAll(".reveal").forEach((el) => el.classList.add("visible"));
-    return;
-  }
-  observer ??= new IntersectionObserver(
-    (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("visible"), observer.unobserve(e.target))),
-    { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
-  );
-  document.querySelectorAll(".reveal:not(.visible)").forEach((el) => observer.observe(el));
-}
-
-function setupTheme() {
   $("#theme-toggle").addEventListener("click", () => {
     const root = document.documentElement;
     const current = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     const next = current === "dark" ? "light" : "dark";
     root.dataset.theme = next;
     try { localStorage.setItem("theme", next); } catch (e) {}
+  });
+
+  const toast = $("#toast");
+  $("#copy-email").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(PROFILE.email);
+      toast.textContent = t("copied");
+    } catch (e) {
+      toast.textContent = PROFILE.email;
+    }
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
   });
 }
 
@@ -239,28 +305,6 @@ function setupNav() {
   anchors.forEach((a) => { const s = document.querySelector(a.hash); if (s) spy.observe(s); });
 }
 
-function setupCopy() {
-  const toast = $("#toast");
-  $("#copy-email").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(PROFILE.email);
-      toast.textContent = "Email address copied";
-    } catch (e) {
-      toast.textContent = PROFILE.email;
-    }
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2000);
-  });
-}
-
-renderProfile();
-renderFeatured();
-renderFilters();
-renderGrid();
-renderSkills();
-renderTimeline();
-setupModal();
-setupTheme();
+renderAll();
+setupEvents();
 setupNav();
-setupCopy();
-observeReveals();

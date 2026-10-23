@@ -5,7 +5,7 @@ import { useI18n } from "../i18n.jsx";
 import { useSectionNav } from "../useSectionNav.js";
 import { BUSINESS } from "../config/business.js";
 import { FREE_SHIPPING_FROM } from "../format.js";
-import { BagIcon, CloseIcon, MenuIcon } from "./Icons.jsx";
+import { BagIcon, CloseIcon, GridIcon, MenuIcon } from "./Icons.jsx";
 
 export const SECTIONS = [
   ["produits", "navShop"],
@@ -39,6 +39,11 @@ export default function Header() {
         </nav>
 
         <div className="header-actions">
+          {/* Demo: the admin dashboard is linked openly so visitors can try it */}
+          <Link to="/admin" className="admin-btn" title={t("adminLink")} aria-label={t("adminLink")}>
+            <GridIcon size={18} />
+            <span className="admin-label">{t("adminShort")}</span>
+          </Link>
           <button className="lang-btn" onClick={toggle} aria-label={t("switchLangLabel")}>
             {t("switchLang")}
           </button>
