@@ -26,7 +26,7 @@ const PROFILE = {
     { label: "Languages", value: "Arabic, French, English, Turkish" },
   ],
   socials: [
-    { label: "GitHub", url: "https://github.com/AminaBouzenada" },
+    { label: "GitHub", url: "https://github.com/aminabouzenadapro" },
     { label: "LinkedIn", url: "https://www.linkedin.com/in/amina-bouzenada-24b555446" },
     { label: "Email", url: "mailto:amina.bouzenada.pro@gmail.com" },
   ],
@@ -67,7 +67,7 @@ const PROJECTS = [
     image: "images/dzair-tech.jpg",
     url: "dzair-tech.dz",
     color: "#1d4ed8",
-    github: "https://github.com/AminaBouzenada/portfolio/tree/main/projects/shop",
+    github: "https://github.com/aminabouzenadapro/portfolio/tree/main/projects/shop",
     demo: "projects/shop/dist/",
     featured: true,
   },
