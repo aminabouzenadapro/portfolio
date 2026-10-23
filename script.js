@@ -36,6 +36,9 @@ function renderProfile() {
   $("#facts").innerHTML = (p.facts || []).map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join("");
 
   $("#email-link").href = `mailto:${p.email}`;
+  // Hide the CV button until a resume file is set
+  if (p.resume) $("#cv-btn").href = p.resume;
+  else $("#cv-btn").remove();
   $("#copy-label").textContent = p.email;
   $("#year").textContent = new Date().getFullYear();
   $("#socials").innerHTML = p.socials

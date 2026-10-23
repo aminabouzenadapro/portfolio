@@ -4,29 +4,31 @@
    ===================================================================== */
 
 const PROFILE = {
-  name: "Your Name",
-  role: "Software Developer",
+  name: "Amina Bouzenada",
+  role: "Full-Stack Developer",
   // Hero headline. Wrap words in *stars* to give them the gradient highlight.
-  headline: "Software developer building *fast, reliable* products.",
-  tagline: "I design and build web applications end to end, from clean interfaces to solid APIs, with a focus on quality and performance.",
+  headline: "Full-stack developer building *web and mobile* products.",
+  tagline: "I design and build web and mobile applications end to end with React, Node.js and Flutter, for clients and for a product I co-own with a local company.",
   status: "Open to new opportunities",   // "" hides the green badge
   avatar: "",                            // e.g. "images/me.jpg" ("" shows your initials)
-  email: "you@example.com",
+  email: "amina.bouzenada.pro@gmail.com",
+  resume: "",                            // e.g. "resume.pdf" ("" hides the Download CV button)
   // One string per paragraph
   about: [
-    "I'm a software developer who enjoys turning ideas into products people actually use. I care about clean code, thoughtful UX and shipping things that work reliably.",
-    "Right now I work as a developer, building and maintaining features for real customers. In my free time I build side projects to explore new tools and ideas.",
-    "Replace these paragraphs with your own short professional summary: what you do, what you're good at and what you're looking for next.",
+    "I'm a full-stack developer based in Constantine, Algeria. I build complete products: responsive web apps with React, mobile apps with Flutter, and the APIs and databases behind them with Node.js, PHP and Python.",
+    "For the past year I've worked as a freelancer, taking client projects from the first idea to deployment. I'm also the co-owner of a product developed with a local company, where I'm involved in both the technical side and the product decisions.",
+    "I care about clean, maintainable code and interfaces that feel simple to use. I work comfortably in Arabic, French, English and Turkish.",
   ],
   facts: [
-    { label: "Based in", value: "Your City, Country" },
-    { label: "Currently", value: "Developer at Company" },
-    { label: "Focus", value: "Full-stack web" },
-    { label: "Languages", value: "English, French" },
+    { label: "Based in", value: "Constantine, Algeria" },
+    { label: "Currently", value: "Freelancer & product co-owner" },
+    { label: "Focus", value: "Full-stack web & mobile" },
+    { label: "Languages", value: "Arabic, French, English, Turkish" },
   ],
   socials: [
     { label: "GitHub", url: "https://github.com/AminaBouzenada" },
-    { label: "LinkedIn", url: "https://linkedin.com/in/yourname" },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/amina-bouzenada-24b555446" },
+    { label: "Email", url: "mailto:amina.bouzenada.pro@gmail.com" },
   ],
 };
 
@@ -76,9 +78,9 @@ const PROJECTS = [
    in the "Tech I work with" row at the top)
    --------------------------------------------------------------------- */
 const SKILLS = [
-  { group: "Front end", items: ["TypeScript", "React", "Next.js", "Vue", "Tailwind CSS"] },
-  { group: "Back end", items: ["Node.js", "Python", "PostgreSQL", "REST & GraphQL"] },
-  { group: "Tools", items: ["Git", "Docker", "Figma", "CI/CD", "Linux"] },
+  { group: "Front end & mobile", items: ["React", "Flutter", "JavaScript", "HTML & CSS"] },
+  { group: "Back end", items: ["Node.js", "PHP", "Python", "REST APIs"] },
+  { group: "Databases & tools", items: ["MySQL", "MongoDB", "Git"] },
 ];
 
 /* ---------------------------------------------------------------------
@@ -86,21 +88,15 @@ const SKILLS = [
    --------------------------------------------------------------------- */
 const TIMELINE = [
   {
-    when: "2024 — Present",
-    title: "Software Developer",
-    where: "Company Name",
-    text: "Building and maintaining web applications used every day by customers. Describe your impact and the technologies you use.",
-  },
-  {
-    when: "2023",
-    title: "Freelance Developer",
+    when: "2025 — Present",
+    title: "Freelance Full-Stack Developer",
     where: "Self-employed",
-    text: "Designed and built websites and small web apps for local businesses.",
+    text: "Designing and building web and mobile applications for clients, from gathering requirements to deployment and maintenance, with React, Flutter, Node.js, PHP and MySQL/MongoDB.",
   },
   {
-    when: "2021 — 2026",
-    title: "Your Degree",
-    where: "University Name",
-    text: "Final year. Mention your thesis, favorite courses or achievements.",
+    when: "Present",
+    title: "Co-owner & Developer",
+    where: "Product built with a local company",
+    text: "Co-owning and developing a product in partnership with a local company: building features, shaping the product and working directly with the business side.",
   },
 ];
