@@ -1,0 +1,82 @@
+{
+ "chorba": {
+  "source": "https://commons.wikimedia.org/wiki/File:Chorba_frik_de_T%C3%A9bessa.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Waran18"
+ },
+ "bourek": {
+  "source": "https://commons.wikimedia.org/wiki/File:Bourek_alg%C3%A9rien.jpg",
+  "license": "CC0",
+  "author": "Sib2022"
+ },
+ "hmiss": {
+  "source": "https://commons.wikimedia.org/wiki/File:Salade_Mechouwya,_Tunisie,_juin_2021.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Habib M'henni"
+ },
+ "couscous": {
+  "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Algerian_Couscous_with_Vegetables.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "HaJunkiyada"
+ },
+ "rechta": {
+  "source": "https://commons.wikimedia.org/wiki/File:20161201_211344_rechta.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "ABBASHouda"
+ },
+ "chakhchoukha": {
+  "source": "https://commons.wikimedia.org/wiki/File:Algerian_Chakhchoukha.jpg",
+  "license": "CC0",
+  "author": "Plwnt"
+ },
+ "tajine-zitoune": {
+  "source": "https://commons.wikimedia.org/wiki/File:Meatballtajine.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Slothtysloth"
+ },
+ "brochettes": {
+  "source": "https://commons.wikimedia.org/wiki/File:Shashlik.jpg",
+  "license": "Public domain",
+  "author": "Игоревич"
+ },
+ "mhadjeb": {
+  "source": "https://commons.wikimedia.org/wiki/File:Mhadjeb_d%27alg%C3%A9rie_09.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "R"
+ },
+ "garantita": {
+  "source": "https://commons.wikimedia.org/wiki/File:Karantika_Algerian.jpg",
+  "license": "CC0",
+  "author": "Plwnt"
+ },
+ "makrout": {
+  "source": "https://commons.wikimedia.org/wiki/File:Makrouds.JPG",
+  "license": "Public domain",
+  "author": "Credits to Mourad Ben Abdallah / Wikimedia Commons"
+ },
+ "zlabia": {
+  "source": "https://commons.wikimedia.org/wiki/File:Jalebi_2.jpg",
+  "license": "Public domain",
+  "author": "Haroldandkumar at English Wikipedia"
+ },
+ "baklawa": {
+  "source": "https://commons.wikimedia.org/wiki/File:Baklawaalgerienne.jpg",
+  "license": "CC BY-SA 4.0",
+  "author": "Slothtysloth"
+ },
+ "the-menthe": {
+  "source": "https://commons.wikimedia.org/wiki/File:The_menthe.jpg",
+  "license": "CC BY-SA 3.0",
+  "author": "Wikimedia Commons"
+ },
+ "citronnade": {
+  "source": "https://commons.wikimedia.org/wiki/File:Lemonade_2.jpg",
+  "license": "CC BY 4.0",
+  "author": "Shisma"
+ },
+ "cafe": {
+  "source": "https://commons.wikimedia.org/wiki/File:Brown_cup_of_coffee.jpg",
+  "license": "CC BY 3.0",
+  "author": "DocteurCosmos"
+ }
+}

@@ -131,6 +131,52 @@ const PROJECTS = [
     ],
     featured: true,
   },
+  {
+    title: "Dar El Bahdja",
+    category: { en: "Mobile & web app", fr: "Application mobile & web", ar: "تطبيق جوال وويب" },
+    summary: {
+      en: "A Flutter app for an Algerian restaurant: guests order from their table by scanning a QR code, and the kitchen follows every order live.",
+      fr: "Une application Flutter pour un restaurant algérien : les clients commandent depuis leur table en scannant un QR code, et la cuisine suit chaque commande en direct.",
+      ar: "تطبيق Flutter لمطعم جزائري: يطلب الزبائن من طاولتهم بمسح رمز QR، ويتابع المطبخ كل طلب مباشرة.",
+    },
+    description: {
+      en: [
+        "Dar El Bahdja is a QR-code table ordering app built with Flutter, from one codebase for the web and Android. Each table has its own QR code; guests browse a menu of Algerian dishes (chorba, couscous, rechta, mhadjeb, makrout…) with photos and prices in dinars, add notes like \"no onions\", and send their order straight to the kitchen.",
+        "The kitchen screen shows tickets in three columns (new, preparing, ready to serve) with timers that turn red when an order is late. Each step the kitchen takes updates the guest's phone live, and guests can call a waiter or ask for the bill, which appears instantly in the kitchen.",
+        "The app works in French, Arabic and English with a full right-to-left layout. State is managed with ChangeNotifier and saved on the device, with tabs kept in sync; the order logic is covered by unit tests. A demo mode shows the guest's phone and the kitchen side by side. It's a demo: data stays in the browser.",
+      ],
+      fr: [
+        "Dar El Bahdja est une application de commande à table par QR code, développée avec Flutter à partir d'un seul code pour le web et Android. Chaque table a son QR code ; les clients parcourent un menu de plats algériens (chorba, couscous, rechta, mhadjeb, makrout…) avec photos et prix en dinars, ajoutent une remarque comme « sans oignons » et envoient leur commande directement en cuisine.",
+        "L'écran de la cuisine affiche les tickets en trois colonnes (nouvelles, en préparation, prêtes à servir) avec des minuteurs qui passent au rouge en cas de retard. Chaque étape validée en cuisine met à jour le téléphone du client en direct, et le client peut appeler un serveur ou demander l'addition, ce qui apparaît aussitôt en cuisine.",
+        "L'application fonctionne en français, en arabe et en anglais, avec une mise en page de droite à gauche. L'état est géré avec ChangeNotifier et sauvegardé sur l'appareil, avec synchronisation entre onglets ; la logique des commandes est couverte par des tests unitaires. Un mode démo montre le téléphone du client et la cuisine côte à côte. C'est une démo : les données restent dans le navigateur.",
+      ],
+      ar: [
+        "دار البهجة تطبيق للطلب من الطاولة عبر رمز QR، مطوَّر بـ Flutter بشيفرة واحدة للويب وأندرويد. لكل طاولة رمز QR خاص بها؛ يتصفح الزبائن قائمة أطباق جزائرية (شوربة، كسكس، رشتة، محاجب، مقروط…) مع الصور والأسعار بالدينار، ويضيفون ملاحظات مثل «بدون بصل»، ثم يرسلون الطلب مباشرة إلى المطبخ.",
+        "تعرض شاشة المطبخ التذاكر في ثلاثة أعمدة (جديدة، قيد التحضير، جاهزة للتقديم) مع مؤقتات تتحول إلى الأحمر عند التأخر. كل خطوة في المطبخ تُحدّث هاتف الزبون مباشرة، ويمكن للزبون نداء النادل أو طلب الفاتورة فيظهر ذلك فورا في المطبخ.",
+        "يعمل التطبيق بالفرنسية والعربية والإنجليزية مع تخطيط كامل من اليمين إلى اليسار. تُدار الحالة بـ ChangeNotifier وتُحفظ على الجهاز مع مزامنة بين النوافذ، ومنطق الطلبات مغطى باختبارات وحدات. ويعرض وضع العرض هاتف الزبون والمطبخ جنبا إلى جنب. هذه نسخة تجريبية: تبقى البيانات في المتصفح.",
+      ],
+    },
+    role: { en: "Flutter developer", fr: "Développement Flutter", ar: "تطوير Flutter" },
+    year: "2026",
+    tags: [
+      "Flutter", "Dart", "Material 3",
+      { en: "QR codes", fr: "QR codes", ar: "رموز QR" },
+      { en: "Live order tracking", fr: "Suivi en direct", ar: "تتبع مباشر" },
+      "i18n (FR/AR/EN)",
+      { en: "Unit tests", fr: "Tests unitaires", ar: "اختبارات الوحدات" },
+    ],
+    image: "",
+    video: "videos/dar-el-bahdja-demo.mp4",
+    poster: "videos/dar-el-bahdja-poster.jpg",
+    url: "dar-el-bahdja.dz",
+    color: "#0e5e6f",
+    github: "",
+    demo: "projects/restaurant/app/#/demo",
+    links: [
+      { label: { en: "Kitchen screen", fr: "Écran cuisine", ar: "شاشة المطبخ" }, url: "projects/restaurant/app/#/kitchen" },
+    ],
+    featured: true,
+  },
 ];
 
 /* ---------------------------------------------------------------------
