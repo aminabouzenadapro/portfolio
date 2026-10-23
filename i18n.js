@@ -31,6 +31,7 @@ const UI = {
     visit_live: "Visit live site", view_source: "View source",
     role: "Role", year: "Year", type: "Type", close: "Close",
     view_details: "View details for {name}", screenshot: "{name} screenshot",
+    live_demo: "Live demo", demo_title: "{name}, live demo",
   },
   fr: {
     skip: "Aller au contenu",
@@ -52,6 +53,7 @@ const UI = {
     visit_live: "Voir le site en ligne", view_source: "Voir le code",
     role: "Rôle", year: "Année", type: "Type", close: "Fermer",
     view_details: "Voir les détails de {name}", screenshot: "Capture d'écran de {name}",
+    live_demo: "Démo en direct", demo_title: "{name}, démo en direct",
   },
   ar: {
     skip: "انتقل إلى المحتوى",
@@ -73,6 +75,7 @@ const UI = {
     visit_live: "زيارة الموقع", view_source: "عرض الشيفرة",
     role: "الدور", year: "السنة", type: "النوع", close: "إغلاق",
     view_details: "عرض تفاصيل {name}", screenshot: "لقطة شاشة لـ {name}",
+    live_demo: "عرض مباشر", demo_title: "{name}، عرض مباشر",
   },
 };
 

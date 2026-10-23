@@ -78,6 +78,8 @@ const PROFILE = {
      color        accent color for the card, e.g. "#6366f1"
      github       link to the code ("" to hide)
      demo         link to the live site ("" to hide)
+     embed        page to show as a live, clickable demo instead of the
+                  screenshot (must be on the same site, e.g. "projects/x/")
      links        extra links: [{ label: "...", url: "..." }]
      featured     true = large card at the top of the Work section
    --------------------------------------------------------------------- */
@@ -119,8 +121,9 @@ const PROJECTS = [
     image: "images/dzair-tech.jpg",
     url: "dzair-tech.dz",
     color: "#1d4ed8",
-    github: "https://github.com/aminabouzenadapro/portfolio/tree/main/projects/shop",
+    github: "",
     demo: "projects/shop/dist/",
+    embed: "projects/shop/dist/",       // live, clickable demo shown instead of the screenshot
     links: [
       { label: { en: "Admin dashboard", fr: "Tableau de bord", ar: "لوحة الإدارة" }, url: "projects/shop/dist/#/admin" },
     ],

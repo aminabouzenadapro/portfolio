@@ -519,3 +519,27 @@ html[lang="ar"] .hero-title { line-height: 1.25; }
 @media (max-width: 720px) {
   .lang-switch button { min-width: 28px; padding: 0 6px; }
 }
+
+/* ---------- Live demo inside the browser frame ---------- */
+.visual.live { display: flex; padding: 18px; min-height: 460px; }
+.visual.live .browser {
+  position: relative; inset: auto; width: 100%; height: auto; flex: 1;
+  display: flex; flex-direction: column;
+  border: 1px solid var(--line-strong); border-radius: 10px;
+  transform: none !important;
+}
+.visual.live iframe { flex: 1; width: 100%; min-height: 360px; border: 0; background: #fff; display: block; }
+.live-badge {
+  margin-inline-start: auto; display: inline-flex; align-items: center; gap: 6px;
+  font-style: normal; font-size: 0.68rem; font-weight: 600; color: var(--text-2); white-space: nowrap;
+}
+.live-badge b { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
+.card .visual.live { aspect-ratio: auto; min-height: 380px; }
+.modal .visual.live { aspect-ratio: auto; height: min(72vh, 640px); min-height: 0; }
+@media (max-width: 960px) {
+  .feature .visual.live, .feature.flip .visual.live { aspect-ratio: auto; height: 560px; min-height: 0; padding: 12px; }
+}
+@media (max-width: 720px) {
+  .feature .visual.live, .feature.flip .visual.live { height: 520px; }
+  .modal .visual.live { height: 70vh; padding: 10px; }
+}

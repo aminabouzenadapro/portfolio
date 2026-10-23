@@ -72,8 +72,22 @@ function renderProfile() {
 }
 
 /* ---------- Project visuals ---------- */
+// A live, clickable demo of the project inside a browser frame
+function liveVisual(p) {
+  return `
+    <div class="visual live" style="--c:${safeColor(p.color)}">
+      <div class="browser" dir="ltr">
+        <div class="browser-bar"><i></i><i></i><i></i>${p.url ? `<span>${esc(p.url)}</span>` : ""}
+          <em class="live-badge" lang="${LANG}" dir="auto"><b></b>${esc(t("live_demo"))}</em>
+        </div>
+        <iframe src="${esc(safeUrl(p.embed))}" title="${esc(t("demo_title", { name: tx(p.title) }))}" loading="lazy"></iframe>
+      </div>
+    </div>`;
+}
+
 // Screenshot (or a generated app mockup) inside a browser frame
 function visual(p) {
+  if (p.embed) return liveVisual(p);
   const inner = p.image
     ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(t("screenshot", { name: tx(p.title) }))}" loading="lazy" />`
     : `<div class="mock" aria-hidden="true">
