@@ -78,8 +78,9 @@ const PROFILE = {
      color        accent color for the card, e.g. "#6366f1"
      github       link to the code ("" to hide)
      demo         link to the live site ("" to hide)
-     embed        page to show as a live, clickable demo instead of the
-                  screenshot (must be on the same site, e.g. "projects/x/")
+     video        demo video (MP4) shown instead of the screenshot,
+                  playing on a loop, e.g. "videos/my-project.mp4"
+     poster       image shown while the video loads
      links        extra links: [{ label: "...", url: "..." }]
      featured     true = large card at the top of the Work section
    --------------------------------------------------------------------- */
@@ -123,7 +124,8 @@ const PROJECTS = [
     color: "#1d4ed8",
     github: "",
     demo: "projects/shop/dist/",
-    embed: "projects/shop/dist/",       // live, clickable demo shown instead of the screenshot
+    video: "videos/dzair-tech-demo.mp4",      // demo video shown instead of the screenshot
+    poster: "videos/dzair-tech-poster.jpg",   // first frame, shown while the video loads
     links: [
       { label: { en: "Admin dashboard", fr: "Tableau de bord", ar: "لوحة الإدارة" }, url: "projects/shop/dist/#/admin" },
     ],

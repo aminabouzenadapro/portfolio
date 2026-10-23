@@ -72,22 +72,28 @@ function renderProfile() {
 }
 
 /* ---------- Project visuals ---------- */
-// A live, clickable demo of the project inside a browser frame
-function liveVisual(p) {
+// Demo video of the project inside a browser frame. It plays muted on a loop,
+// except for visitors who ask for reduced motion (they get play controls instead).
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function videoVisual(p, { controls = false } = {}) {
+  const autoplay = !reduceMotion;
   return `
-    <div class="visual live" style="--c:${safeColor(p.color)}">
+    <div class="visual video" style="--c:${safeColor(p.color)}">
       <div class="browser" dir="ltr">
         <div class="browser-bar"><i></i><i></i><i></i>${p.url ? `<span>${esc(p.url)}</span>` : ""}
-          <em class="live-badge" lang="${LANG}" dir="auto"><b></b>${esc(t("live_demo"))}</em>
+          <em class="live-badge" lang="${LANG}" dir="auto"><b></b>${esc(t("demo_video"))}</em>
         </div>
-        <iframe src="${esc(safeUrl(p.embed))}" title="${esc(t("demo_title", { name: tx(p.title) }))}" loading="lazy"></iframe>
+        <video src="${esc(safeUrl(p.video))}" ${p.poster ? `poster="${esc(safeUrl(p.poster))}"` : ""}
+          ${autoplay ? "autoplay" : ""} muted loop playsinline preload="${autoplay ? "auto" : "metadata"}"
+          ${controls || !autoplay ? "controls" : ""} aria-label="${esc(t("demo_title", { name: tx(p.title) }))}"></video>
       </div>
     </div>`;
 }
 
 // Screenshot (or a generated app mockup) inside a browser frame
-function visual(p) {
-  if (p.embed) return liveVisual(p);
+function visual(p, opts) {
+  if (p.video) return videoVisual(p, opts);
   const inner = p.image
     ? `<img src="${esc(safeUrl(p.image))}" alt="${esc(t("screenshot", { name: tx(p.title) }))}" loading="lazy" />`
     : `<div class="mock" aria-hidden="true">
@@ -180,7 +186,7 @@ function openProject(i) {
     p.github && `<a class="btn btn-secondary" href="${esc(safeUrl(p.github))}" target="_blank" rel="noopener noreferrer">${ICON.code} ${esc(t("view_source"))}</a>`,
   ].filter(Boolean).join("");
   $("#modal-content").innerHTML = `
-    ${visual(p)}
+    ${visual(p, { controls: true })}
     <div class="modal-body">
       <span class="cat">${esc(tx(p.category))}</span>
       <h3 id="modal-title">${esc(tx(p.title))}</h3>
