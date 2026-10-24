@@ -223,6 +223,50 @@ const PROJECTS = [
     ],
     featured: true,
   },
+  {
+    title: "Twiza",
+    category: { en: "Python web app", fr: "Application web Python", ar: "تطبيق ويب بايثون" },
+    summary: {
+      en: "Events for a volunteer association in Constantine: free registration with QR tickets and a waitlist, check-in at the door by camera, and a dashboard for the team.",
+      fr: "Les événements d'une association de bénévoles à Constantine : inscription gratuite avec billet QR et liste d'attente, accueil par caméra à l'entrée et tableau de bord pour l'équipe.",
+      ar: "فعاليات جمعية متطوعين في قسنطينة: تسجيل مجاني بتذكرة QR وقائمة انتظار، واستقبال بالكاميرا عند المدخل، ولوحة متابعة للفريق.",
+    },
+    description: {
+      en: [
+        "Twiza helps a volunteer association run its events: tree planting, blood drives, kids' coding workshops and heritage walks. Anyone can register in a minute without an account and receive a ticket with a QR code, an add-to-calendar file and a cancel button. When an event is full, people join a waitlist, and a cancellation or a bigger room confirms the first in line automatically.",
+        "On the day, volunteers open the check-in screen on their phone and scan tickets with the camera or type the code. Each scan gives a clear answer: welcome, already in (with the time and who checked them in), wrong event, on the waitlist, cancelled or too early. Organizers follow registrations and attendance on a dashboard, search and export the lists as CSV, and create events in French, Arabic and English.",
+        "The back end is Python: FastAPI, SQLAlchemy 2.0 and Pydantic, with roles for organizers and volunteers and 17 pytest tests. The front end is plain JavaScript with no framework or build step. The live demo runs the actual FastAPI app inside the visitor's browser with Pyodide (Python on WebAssembly) and keeps its SQLite database in IndexedDB, so there's no JavaScript copy of the back end.",
+      ],
+      fr: [
+        "Twiza aide une association de bénévoles à organiser ses événements : plantations d'arbres, collectes de sang, ateliers de code pour enfants, balades patrimoine. Chacun s'inscrit en une minute, sans compte, et reçoit un billet avec QR code, un fichier pour son agenda et un bouton d'annulation. Quand c'est complet, on rejoint une liste d'attente : une annulation ou une salle plus grande confirme automatiquement la première personne.",
+        "Le jour J, les bénévoles ouvrent l'écran d'accueil sur leur téléphone et scannent les billets avec la caméra ou tapent le code. Chaque passage donne une réponse claire : bienvenue, déjà entré (avec l'heure et le bénévole), mauvais événement, liste d'attente, annulé ou trop tôt. Les organisatrices suivent inscriptions et présences sur un tableau de bord, recherchent et exportent les listes en CSV, et créent les événements en français, arabe et anglais.",
+        "Le back-end est en Python : FastAPI, SQLAlchemy 2.0 et Pydantic, avec des rôles organisatrice et bénévole et 17 tests pytest. Le front-end est en JavaScript natif, sans framework ni étape de build. La démo en ligne exécute la vraie application FastAPI dans le navigateur du visiteur grâce à Pyodide (Python en WebAssembly) et garde sa base SQLite dans IndexedDB : il n'y a pas de copie du back-end en JavaScript.",
+      ],
+      ar: [
+        "تساعد تويزة جمعية متطوعين على تنظيم فعالياتها: غرس الأشجار والتبرع بالدم وورشات البرمجة للأطفال والجولات التراثية. يسجل أي شخص في دقيقة دون حساب ويحصل على تذكرة برمز QR وملف للرزنامة وزر للإلغاء. وعند اكتمال الأماكن ينضم إلى قائمة انتظار، فيؤكد الإلغاء أو توسيع القاعة أول شخص فيها تلقائيا.",
+        "يوم الفعالية يفتح المتطوعون شاشة الاستقبال في هواتفهم ويمسحون التذاكر بالكاميرا أو يكتبون الرمز. ويعطي كل مسح جوابا واضحا: أهلا وسهلا، سبق دخوله (مع الوقت واسم المتطوع)، فعالية أخرى، قائمة الانتظار، ملغاة أو مبكر جدا. وتتابع المنظمات التسجيلات والحضور في لوحة متابعة، ويبحثن في القوائم ويصدرنها بصيغة CSV، وينشئن الفعاليات بالفرنسية والعربية والإنجليزية.",
+        "الواجهة الخلفية مكتوبة ببايثون: FastAPI وSQLAlchemy 2.0 وPydantic، مع دوري المنظمة والمتطوع و17 اختبار pytest. والواجهة الأمامية بجافاسكريبت أصلية دون إطار عمل ولا مرحلة بناء. وتشغّل النسخة المنشورة تطبيق FastAPI الحقيقي داخل متصفح الزائر بفضل Pyodide (بايثون على WebAssembly) وتحفظ قاعدة SQLite في IndexedDB، دون أي نسخة من الواجهة الخلفية بجافاسكريبت.",
+      ],
+    },
+    role: { en: "Full-stack developer", fr: "Développement full-stack", ar: "تطوير متكامل" },
+    year: "2026",
+    tags: [
+      "Python", "FastAPI", "SQLAlchemy", "Pydantic",
+      { en: "QR tickets & scanner", fr: "Billets et scan QR", ar: "تذاكر ومسح QR" },
+      "Pyodide / WebAssembly", "Vanilla JS", "pytest", "i18n (FR/AR/EN)",
+    ],
+    image: "",
+    video: "videos/twiza-demo.mp4",
+    poster: "videos/twiza-poster.jpg",
+    url: "twiza-dz.org",
+    color: "#12715b",
+    github: "",
+    demo: "projects/events/web/",
+    links: [
+      { label: { en: "Check-in screen", fr: "Écran d'accueil", ar: "شاشة الاستقبال" }, url: "projects/events/web/#/staff/checkin" },
+    ],
+    featured: true,
+  },
 ];
 
 /* ---------------------------------------------------------------------
