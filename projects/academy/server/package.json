@@ -1,0 +1,28 @@
+{
+  "name": "cirta-academy-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "REST API for Cirta Academy: courses, enrollments, quizzes, certificates and the teacher dashboard",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "seed": "node src/seed.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.2.0",
+    "supertest": "^7.1.4"
+  }
+}

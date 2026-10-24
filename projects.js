@@ -177,6 +177,52 @@ const PROJECTS = [
     ],
     featured: true,
   },
+  {
+    title: "Cirta Academy",
+    category: { en: "Full-stack web app", fr: "Application web full-stack", ar: "تطبيق ويب متكامل" },
+    summary: {
+      en: "A training center platform for Constantine: students follow lessons, pass quizzes and earn verifiable certificates, while teachers track progress and edit their courses.",
+      fr: "Une plateforme pour un centre de formation à Constantine : les étudiants suivent leurs leçons, passent des quiz et obtiennent des certificats vérifiables, et les formateurs suivent leur progression et modifient leurs cours.",
+      ar: "منصة لمركز تكوين في قسنطينة: يتابع الطلبة دروسهم ويجتازون الاختبارات ويحصلون على شهادات قابلة للتحقق، ويتابع المكوّنون تقدمهم ويعدّلون دوراتهم.",
+    },
+    description: {
+      en: [
+        "Cirta Academy is a full-stack platform for a training center in Constantine, with courses in web development, Python, business English, Excel, digital marketing and Baccalaureate maths. Visitors browse the catalog by category and level, see the schedule, price in dinars and seats left, and enroll online.",
+        "Students follow each lesson with their progress saved, then take a final quiz graded on the server. Once every lesson is done and the quiz is passed, a certificate is issued with a code that anyone (an employer, for example) can check on a public page. Teachers get a dashboard with weekly sign-ups, average progress and scores, the students who have stopped coming, completion per lesson, and an editor for lessons and quizzes.",
+        "The back end is a REST API in Node.js and Express with MongoDB (Mongoose), JWT authentication, bcrypt, role checks and rate limiting, covered by 24 tests that run against a real MongoDB. The React front end works in French, Arabic and English with a right-to-left layout. The hosted demo runs the same API rules inside the browser, so it works without a server: data stays in the browser.",
+      ],
+      fr: [
+        "Cirta Academy est une plateforme full-stack pour un centre de formation à Constantine, avec des cours de développement web, Python, anglais professionnel, Excel, marketing digital et mathématiques du Bac. Les visiteurs parcourent le catalogue par catégorie et niveau, voient l'horaire, le prix en dinars et les places restantes, et s'inscrivent en ligne.",
+        "Les étudiants suivent chaque leçon avec leur progression enregistrée, puis passent un quiz final corrigé par le serveur. Quand toutes les leçons sont terminées et le quiz réussi, un certificat est délivré avec un code que n'importe qui (un employeur, par exemple) peut vérifier sur une page publique. Les formateurs ont un tableau de bord avec les inscriptions par semaine, la progression et les scores moyens, les étudiants qui décrochent, l'avancement par leçon et un éditeur de leçons et de quiz.",
+        "Le back-end est une API REST en Node.js et Express avec MongoDB (Mongoose), authentification JWT, bcrypt, contrôle des rôles et limitation des tentatives, couverte par 24 tests qui tournent sur une vraie base MongoDB. Le front-end React fonctionne en français, en arabe et en anglais, avec une mise en page de droite à gauche. La démo en ligne exécute les mêmes règles d'API dans le navigateur, elle fonctionne donc sans serveur : les données restent dans le navigateur.",
+      ],
+      ar: [
+        "Cirta Academy منصة متكاملة لمركز تكوين في قسنطينة، تضم دورات في تطوير الويب وبايثون والإنجليزية المهنية وإكسل والتسويق الرقمي ورياضيات البكالوريا. يتصفح الزوار الدورات حسب الفئة والمستوى، ويطّلعون على التوقيت والسعر بالدينار والأماكن المتبقية، ثم يسجلون عبر الإنترنت.",
+        "يتابع الطلبة كل درس مع حفظ تقدمهم، ثم يجتازون اختبارا نهائيا يصححه الخادم. وعند إنهاء كل الدروس والنجاح في الاختبار تُسلَّم شهادة برمز يمكن لأي شخص (صاحب عمل مثلا) التحقق منه في صفحة عامة. ويحصل المكوّنون على لوحة متابعة تعرض التسجيلات الأسبوعية ومتوسط التقدم والنتائج والطلبة المنقطعين والتقدم حسب الدرس، مع محرر للدروس والاختبارات.",
+        "الواجهة الخلفية واجهة REST مبنية بـ Node.js وExpress مع MongoDB (Mongoose)، ومصادقة JWT وbcrypt والتحقق من الأدوار وتحديد عدد المحاولات، وتغطيها 24 اختبارا تعمل على قاعدة MongoDB حقيقية. وتعمل واجهة React بالفرنسية والعربية والإنجليزية مع تخطيط من اليمين إلى اليسار. وتشغّل النسخة المنشورة قواعد الواجهة نفسها داخل المتصفح، فتعمل دون خادم: تبقى البيانات في المتصفح.",
+      ],
+    },
+    role: { en: "Full-stack developer", fr: "Développement full-stack", ar: "تطوير متكامل" },
+    year: "2026",
+    tags: [
+      "Node.js", "Express", "MongoDB", "React",
+      { en: "JWT auth", fr: "Auth JWT", ar: "مصادقة JWT" },
+      { en: "REST API", fr: "API REST", ar: "واجهة REST" },
+      "i18n (FR/AR/EN)",
+      { en: "API tests", fr: "Tests d'API", ar: "اختبارات الواجهة" },
+    ],
+    image: "",
+    video: "videos/cirta-academy-demo.mp4",
+    poster: "videos/cirta-academy-poster.jpg",
+    url: "cirta-academy.dz",
+    color: "#e2583e",
+    github: "",
+    demo: "projects/academy/app/",
+    links: [
+      { label: { en: "Teacher space", fr: "Espace formateur", ar: "فضاء المكوّن" }, url: "projects/academy/app/#/teacher" },
+    ],
+    featured: true,
+  },
 ];
 
 /* ---------------------------------------------------------------------
