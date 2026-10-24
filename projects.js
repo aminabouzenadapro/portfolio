@@ -267,6 +267,51 @@ const PROJECTS = [
     ],
     featured: true,
   },
+  {
+    title: "El Amel",
+    category: { en: "PHP & MySQL web app", fr: "Application web PHP & MySQL", ar: "تطبيق ويب PHP وMySQL" },
+    summary: {
+      en: "Online appointments for a medical center in Constantine: patients book a real free slot and get an SMS, the reception runs the day from an agenda.",
+      fr: "Les rendez-vous en ligne d'un centre médical à Constantine : les patients réservent un vrai créneau libre et reçoivent un SMS, l'accueil gère la journée depuis un agenda.",
+      ar: "مواعيد عبر الإنترنت لمركز طبي في قسنطينة: يحجز المرضى موعدا متاحا فعلا ويتلقون رسالة قصيرة، ويدير الاستقبال اليوم من أجندة.",
+    },
+    description: {
+      en: [
+        "El Amel is the booking system of a medical center with a general practitioner, a dentist and a pediatrician. Patients pick a reason for the visit, see the free slots of the next two weeks and book in two minutes. Slots are computed from each practitioner's hours and grid, the length of the visit, existing appointments, absences and national holidays. Patients get an SMS in their language and can cancel online up to two hours before.",
+        "The reception sees the day as a timeline with one column per practitioner. They mark patients as arrived, seen or absent, take bookings by phone and walk-ins, and block time or whole days, with the list of patients to call. They also get patient histories, 30-day statistics (no-show rate, online share, occupancy) and the SMS outbox with tomorrow's reminders. Doctors only see their own agenda.",
+        "The back end is PHP 8 without a framework: a small router, PDO, and services for availability, bookings and the desk. It runs on MySQL in production, where a booking locks the practitioner's row (SELECT … FOR UPDATE) so two patients can't take the same slot. The 21 PHPUnit tests pass on both MariaDB and SQLite. The front end is Vue 3 from a CDN with no build step. The live demo runs the actual PHP code in the visitor's browser with php-wasm (PHP compiled to WebAssembly) on SQLite.",
+      ],
+      fr: [
+        "El Amel est le système de rendez-vous d'un centre médical avec une généraliste, un dentiste et une pédiatre. Le patient choisit le motif, voit les créneaux libres des deux semaines à venir et réserve en deux minutes. Les créneaux sont calculés à partir des horaires et de la grille de chaque praticien, de la durée de la visite, des rendez-vous existants, des absences et des jours fériés. Le patient reçoit un SMS dans sa langue et peut annuler en ligne jusqu'à deux heures avant.",
+        "L'accueil voit la journée sous forme de planning, une colonne par praticien. Il marque les patients arrivés, vus ou absents, prend les rendez-vous par téléphone et sans rendez-vous, et bloque des créneaux ou des journées, avec la liste des patients à prévenir. Il dispose aussi de l'historique des patients, des statistiques sur 30 jours (taux d'absence, part en ligne, occupation) et de la boîte d'envoi des SMS avec les rappels de la veille. Les médecins ne voient que leur propre agenda.",
+        "Le back-end est en PHP 8 sans framework : un petit routeur, PDO, et des services pour les disponibilités, les réservations et l'accueil. Il tourne sur MySQL en production, où une réservation verrouille la ligne du praticien (SELECT … FOR UPDATE) pour que deux patients ne prennent pas le même créneau. Les 21 tests PHPUnit passent sur MariaDB et sur SQLite. Le front-end est en Vue 3 chargé depuis un CDN, sans étape de build. La démo en ligne exécute le vrai code PHP dans le navigateur du visiteur grâce à php-wasm (PHP compilé en WebAssembly) avec SQLite.",
+      ],
+      ar: [
+        "الأمل هو نظام المواعيد لمركز طبي يضم طبيبة عامة وطبيب أسنان وطبيبة أطفال. يختار المريض سبب الزيارة ويرى المواعيد المتاحة خلال الأسبوعين القادمين ويحجز في دقيقتين. تُحسب المواعيد من أوقات عمل كل طبيب وتقسيمه الزمني ومدة الزيارة والمواعيد الموجودة والغيابات والأعياد الوطنية. ويتلقى المريض رسالة بلغته ويمكنه الإلغاء عبر الإنترنت حتى ساعتين قبل الموعد.",
+        "يرى الاستقبال اليوم في شكل جدول زمني بعمود لكل طبيب. يسجل حضور المرضى أو فحصهم أو غيابهم، ويأخذ المواعيد بالهاتف والزيارات دون موعد، ويحجب أوقاتا أو أياما كاملة مع قائمة المرضى الواجب الاتصال بهم. ويطلع أيضا على سجل المرضى وإحصائيات 30 يوما (نسبة الغياب والحجز عبر الإنترنت والامتلاء) وصندوق الرسائل مع تذكيرات الغد. ولا يرى الأطباء إلا أجندتهم.",
+        "الواجهة الخلفية مكتوبة بـ PHP 8 دون إطار عمل: موجه صغير وPDO وخدمات للمواعيد المتاحة والحجز والاستقبال. وتعمل على MySQL في الإنتاج، حيث يقفل الحجز سطر الطبيب (SELECT … FOR UPDATE) حتى لا يأخذ مريضان الموعد نفسه. وتنجح اختبارات PHPUnit الـ21 على MariaDB وعلى SQLite. والواجهة الأمامية مبنية بـ Vue 3 من شبكة CDN دون مرحلة بناء. وتشغّل النسخة المنشورة شيفرة PHP الحقيقية داخل متصفح الزائر بفضل php-wasm (PHP مترجمة إلى WebAssembly) مع SQLite.",
+      ],
+    },
+    role: { en: "Full-stack developer", fr: "Développement full-stack", ar: "تطوير متكامل" },
+    year: "2026",
+    tags: [
+      "PHP 8", "MySQL", "PDO", "Vue 3", "PHPUnit",
+      { en: "Slot scheduling", fr: "Calcul des créneaux", ar: "حساب المواعيد" },
+      { en: "SMS reminders", fr: "Rappels SMS", ar: "تذكيرات SMS" },
+      "php-wasm / WebAssembly", "i18n (FR/AR/EN)",
+    ],
+    image: "",
+    video: "videos/el-amel-demo.mp4",
+    poster: "videos/el-amel-poster.jpg",
+    url: "centre-elamel.dz",
+    color: "#0f9d8f",
+    github: "",
+    demo: "projects/clinic/web/",
+    links: [
+      { label: { en: "Reception agenda", fr: "Agenda de l'accueil", ar: "أجندة الاستقبال" }, url: "projects/clinic/web/#/staff" },
+    ],
+    featured: true,
+  },
 ];
 
 /* ---------------------------------------------------------------------
