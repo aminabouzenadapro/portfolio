@@ -1,27 +1,55 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Icon from "./Icon.jsx";
 import { useI18n } from "../i18n.jsx";
+import { blobUrl } from "../api/blobs.js";
 
-// Bridge-arch logo: a nod to the suspension bridges of Constantine
+// Plays a lesson video: a demo clip, a signed link from the API, or ("idb:…") a video
+// uploaded in demo mode and stored in this browser
+export function VideoPlayer({ video, autoPlay = false }) {
+  const { t } = useI18n();
+  const local = video?.src?.startsWith("idb:");
+  const [src, setSrc] = useState(local ? undefined : video?.src);
+  useEffect(() => {
+    if (!local) { setSrc(video?.src); return; }
+    let live = true;
+    blobUrl(video.src).then((url) => live && setSrc(url ?? null)).catch(() => live && setSrc(null));
+    return () => { live = false; };
+  }, [video?.src, local]);
+
+  if (!video) return <div className="player empty"><Icon name="play" size={28} /><p>{t("videoSoon")}</p></div>;
+  if (src === null) return <div className="player empty"><Icon name="alert" size={28} /><p>{t("videoOtherDevice")}</p></div>;
+  return (
+    <figure className="player">
+      <video key={src} src={src} poster={video.poster} controls playsInline preload="metadata" autoPlay={autoPlay} muted={autoPlay} loop={autoPlay} />
+      {video.credit && (
+        <figcaption>
+          {t("videoCredit")}: {video.credit.author} · <a href={video.credit.source} target="_blank" rel="noreferrer">{video.credit.license}, Wikimedia Commons</a>
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+// Needle and thread logo
 export function Logo({ light = false }) {
   return (
     <span className={`logo ${light ? "light" : ""}`}>
       <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
         <rect width="40" height="40" rx="11" fill="var(--accent)" />
-        <path d="M6 27c4-11 24-11 28 0" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
-        <path d="M5 27h30M12 21.5V27M20 19.2V27M28 21.5V27" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M27.5 8.5 11 25" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
+        <ellipse cx="27.6" cy="9.4" rx="1.1" ry="2.2" transform="rotate(45 27.6 9.4)" fill="none" stroke="#fff" strokeWidth="1.4" />
+        <path d="M27.6 9.4c-6 2-3 9-9 12s-9 4-8 9" fill="none" stroke="var(--gold)" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
-      <span className="logo-text">Cirta<b>Academy</b></span>
+      <span className="logo-text">Atelier <b>Yasmina</b></span>
     </span>
   );
 }
 
 const CATEGORY_GLYPH = {
-  dev: "M14 16l4-4-4-4M10 8l-4 4 4 4",
-  lang: "M4 5h9M8.5 3v2M6 5c1 4 4 7 7 8M11 5c-1 4-4 7-7 8M13 21l4-10 4 10M14.5 17h5",
-  office: "M3 3h18v18H3zM3 9h18M3 15h18M9 3v18",
-  business: "M3 17l6-6 4 4 8-8M15 7h6v6",
-  school: "M4 20h16M6 20V10M18 20V10M12 4l9 5H3zM10 20v-5h4v5",
+  basics: "M5 19 19 5M17 5h2v2M9 15l-2 2M4 20c3-1 4-4 7-4",
+  patterns: "M4 20 20 4M7 17l2 2M10 14l2 2M13 11l2 2M16 8l2 2M3 21l1-4 13-13 3 3L7 20z",
+  traditional: "M9 3h6l1 4-2 2 3 12H7l3-12-2-2zM10 13h4M9.5 17h5",
+  alterations: "M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12",
 };
 
 // Generated course cover: the course color with an eight-point star (zellige) pattern
@@ -38,7 +66,7 @@ export function CourseCover({ course, compact = false }) {
         <rect width="100%" height="100%" fill={`url(#${id})`} />
       </svg>
       <span className="cover-glyph">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={CATEGORY_GLYPH[course.category] || CATEGORY_GLYPH.dev} /></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={CATEGORY_GLYPH[course.category] || CATEGORY_GLYPH.basics} /></svg>
       </span>
     </div>
   );
@@ -122,8 +150,12 @@ function inline(text) {
   });
 }
 
-// "Sat & Tue · 18:00–20:00"
+// "Sat · Tue — 18:00–20:00", or "At your own pace" for video-only courses
 export function useSchedule() {
   const { t } = useI18n();
-  return (c) => `${c.days.map((d) => t(`day_${d}`)).join(" · ")} — ${c.time}`;
+  return (c) => (c.days?.length ? `${c.days.map((d) => t(`day_${d}`)).join(" · ")} — ${c.time}` : t("ownPace"));
+}
+
+export function formatSize(bytes) {
+  return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }

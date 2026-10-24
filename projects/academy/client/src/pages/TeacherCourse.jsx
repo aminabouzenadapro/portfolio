@@ -1,26 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
-import { Avatar, Bar, ErrorState, Loading, StatusPill } from "../components/ui.jsx";
-import { api, useApi } from "../api/index.js";
+import { Avatar, Bar, ErrorState, Loading, StatusPill, VideoPlayer, formatSize } from "../components/ui.jsx";
+import { api, upload, useApi } from "../api/index.js";
 import { useI18n } from "../i18n.jsx";
 import { CATEGORIES, LEVELS } from "../../../shared/courses.js";
+import { MAX_VIDEO_MB, VIDEO_TYPES } from "../../../shared/logic.js";
 
 const DAYS = ["sat", "sun", "mon", "tue", "wed", "thu", "fri"];
-const COLORS = ["#3b5bdb", "#2b8a3e", "#c2255c", "#e8590c", "#087f5b", "#5f3dc4", "#1971c2", "#9c36b5"];
+const COLORS = ["#b8475f", "#5f3dc4", "#087f5b", "#9c6b12", "#1971c2", "#c2255c", "#2b8a3e", "#e8590c"];
 const EDITABLE = ["title", "summary", "category", "level", "language", "priceDA", "hours", "format", "days", "time", "start", "seats", "color", "outcomes", "lessons", "quiz"];
 
 const BLANK = {
   title: { fr: "", ar: "", en: "" }, summary: { fr: "", ar: "", en: "" },
-  category: "dev", level: "beginner", language: "fr", format: "onsite",
-  priceDA: 10000, hours: 20, seats: 20, days: ["sat"], time: "10:00–12:00",
-  start: new Date(Date.now() + 21 * 86400000).toISOString().slice(0, 10), color: COLORS[6], outcomes: [],
-  lessons: [{ id: "l1", title: "", minutes: 30, content: "" }],
+  category: "basics", level: "beginner", language: "fr", format: "hybrid",
+  priceDA: 8000, hours: 12, seats: 12, days: ["sat"], time: "10:00–12:00",
+  start: new Date(Date.now() + 21 * 86400000).toISOString().slice(0, 10), color: COLORS[0], outcomes: [],
+  lessons: [{ id: "l1", title: "", minutes: 15, free: true, content: "" }],
   quiz: { passMark: 60, questions: [{ id: "q1", q: "", options: ["", ""], answer: 0, explain: "" }] },
 };
 
 const nextId = (prefix, list) => prefix + (Math.max(0, ...list.map((x) => Number(x.id.slice(1)) || 0)) + 1);
-const pickEditable = (c) => Object.fromEntries(EDITABLE.map((k) => [k, c[k]]));
+// Videos are not part of the draft: they are uploaded on their own and shown from the saved course
+const pickEditable = (c) => ({
+  ...Object.fromEntries(EDITABLE.map((k) => [k, c[k]])),
+  lessons: c.lessons.map(({ video, ...l }) => ({ ...l, free: Boolean(l.free) })),
+});
 
 export default function TeacherCourse() {
   const { slug } = useParams();
@@ -38,7 +43,7 @@ export default function TeacherCourse() {
       <div className="page-head row">
         <div>
           <h1>{isNew ? t("newCourse") : tr(data.course.title)}</h1>
-          {!isNew && <p>{t("courseManageLead", { n: data.stats.students })}</p>}
+          {!isNew && <p>{t("courseManageLead", { n: data.stats.students, paid: data.stats.paid })}</p>}
         </div>
         {!isNew && <Link to={`/courses/${slug}`} className="btn ghost"><Icon name="globe" />{t("publicPage")}</Link>}
       </div>
@@ -52,72 +57,129 @@ export default function TeacherCourse() {
       )}
 
       {tab === "students" && !isNew
-        ? <Students data={data} />
+        ? <Students data={data} onChange={setData} />
         : <Editor key={slug || "new"} course={isNew ? BLANK : data.course} isNew={isNew} section={isNew ? "all" : tab} onSaved={setData} />}
     </div>
   );
 }
 
-function Students({ data }) {
-  const { t, ago } = useI18n();
+function Students({ data, onChange }) {
+  const { t, ago, money, date, errMsg } = useI18n();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(null);
+  const [err, setErr] = useState(null);
   const rows = data.students.filter((s) => (!status || s.status === status) && (!q || s.name.toLowerCase().includes(q.toLowerCase())));
   const n = data.students.length || 1;
   const { stats, lessonCompletion, course } = data;
+
+  async function setPaid(s, paid) {
+    if (!paid && !confirm(t("undoPaymentConfirm", { name: s.name }))) return;
+    setBusy(s.email); setErr(null);
+    try { onChange(await api(`/teacher/courses/${course.slug}/students/${encodeURIComponent(s.email)}`, { method: "PATCH", body: { paid } })); }
+    catch (e) { setErr(errMsg(e)); }
+    setBusy(null);
+  }
 
   return (
     <>
       <div className="kpis">
         <div className="kpi"><Icon name="users" /><strong>{stats.students}</strong><span>{t("kpiStudents")}</span></div>
+        <div className="kpi"><Icon name="chart" /><strong>{money(stats.revenue)}</strong><span>{t("kpiRevenue")}</span></div>
+        <div className={`kpi ${stats.pending ? "warn" : ""}`}><Icon name="clock" /><strong>{stats.pending}</strong><span>{t("kpiPendingCount")}</span></div>
         <div className="kpi"><Icon name="book" /><strong>{stats.avgProgress}%</strong><span>{t("kpiAvgProgress")}</span></div>
-        <div className="kpi"><Icon name="quiz" /><strong>{stats.avgScore === null ? "–" : `${stats.avgScore}%`}</strong><span>{t("kpiAvgScore")}</span></div>
-        <div className={`kpi ${stats.atRisk ? "warn" : ""}`}><Icon name="alert" /><strong>{stats.atRisk}</strong><span>{t("kpiAtRisk")}</span></div>
       </div>
 
       <section className="panel">
-          <div className="panel-head">
-            <h2>{t("tab_students")}</h2>
-            <div className="table-tools">
-              <label className="search small"><Icon name="search" size={16} /><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchStudent")} aria-label={t("searchStudent")} /></label>
-              <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label={t("status")}>
-                <option value="">{t("allStatuses")}</option>
-                {["on-track", "at-risk", "completed"].map((s) => <option key={s} value={s}>{t(`status_${s}`)}</option>)}
-              </select>
-            </div>
+        <div className="panel-head">
+          <h2>{t("tab_students")}</h2>
+          <div className="table-tools">
+            <label className="search small"><Icon name="search" size={16} /><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchStudent")} aria-label={t("searchStudent")} /></label>
+            <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label={t("status")}>
+              <option value="">{t("allStatuses")}</option>
+              {["pending", "on-track", "at-risk", "completed"].map((s) => <option key={s} value={s}>{t(`status_${s}`)}</option>)}
+            </select>
           </div>
-          <div className="table-wrap">
-            <table className="table">
-              <thead><tr><th>{t("student")}</th><th>{t("progress")}</th><th>{t("bestQuiz")}</th><th>{t("lastActivityCol")}</th><th>{t("status")}</th></tr></thead>
-              <tbody>
-                {rows.map((s) => (
-                  <tr key={s.email}>
-                    <td><div className="who"><Avatar name={s.name} size={30} /><div><strong>{s.name}</strong><small dir="ltr">{s.email}</small></div></div></td>
-                    <td><div className="bar-cell"><Bar value={s.progress} color={s.progress === 100 ? "var(--success)" : undefined} /><span>{s.progress}%</span></div></td>
-                    <td>{s.bestScore === null ? "–" : <>{s.bestScore}% <small className="muted">({t("attempts", { n: s.attempts })})</small></>}</td>
-                    <td>{ago(s.lastActivity)}</td>
-                    <td>{s.certificate ? <Link to={`/certificate/${s.certificate}`}><StatusPill status="completed" /></Link> : <StatusPill status={s.status} />}</td>
-                  </tr>
-                ))}
-                {!rows.length && <tr><td colSpan="5" className="muted center">{t("noResults")}</td></tr>}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        </div>
+        {err && <p className="form-error" role="alert">{err}</p>}
+        <div className="table-wrap">
+          <table className="table">
+            <thead><tr><th>{t("student")}</th><th>{t("payment")}</th><th>{t("progress")}</th><th>{t("bestQuiz")}</th><th>{t("lastActivityCol")}</th><th>{t("status")}</th></tr></thead>
+            <tbody>
+              {rows.map((s) => (
+                <tr key={s.email}>
+                  <td><div className="who"><Avatar name={s.name} size={30} /><div><strong>{s.name}</strong><small dir="ltr">{s.email}</small></div></div></td>
+                  <td>
+                    {s.paid
+                      ? <button className="paid-tag" onClick={() => setPaid(s, false)} disabled={busy === s.email} title={t("undoPayment")}><Icon name="check" size={14} stroke={3} />{s.paidAt ? t("paidOn", { date: date(s.paidAt, { day: "numeric", month: "short" }) }) : t("paid")}</button>
+                      : <button className="btn small" onClick={() => setPaid(s, true)} disabled={busy === s.email}>{t("markPaid")}</button>}
+                  </td>
+                  <td><div className="bar-cell"><Bar value={s.progress} color={s.progress === 100 ? "var(--success)" : undefined} /><span>{s.progress}%</span></div></td>
+                  <td>{s.bestScore === null ? "–" : <>{s.bestScore}% <small className="muted">({t("attempts", { n: s.attempts })})</small></>}</td>
+                  <td>{ago(s.lastActivity)}</td>
+                  <td>{s.certificate ? <Link to={`/certificate/${s.certificate}`}><StatusPill status="completed" /></Link> : <StatusPill status={s.status} />}</td>
+                </tr>
+              ))}
+              {!rows.length && <tr><td colSpan="6" className="muted center">{t("noResults")}</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        <section className="panel">
-          <div className="panel-head"><h2>{t("lessonFunnel")}</h2></div>
-          <ol className="funnel cols" lang={course.language} dir={course.language === "ar" ? "rtl" : "ltr"}>
-            {lessonCompletion.map((l, i) => (
-              <li key={l.id}>
-                <span className="funnel-label"><b>{i + 1}.</b> {l.title}</span>
-                <span className="bar-cell"><Bar value={(l.done / n) * 100} /><span>{l.done}/{data.students.length}</span></span>
-              </li>
-            ))}
-          </ol>
-          <p className="muted small">{t("funnelHint")}</p>
-        </section>
+      <section className="panel">
+        <div className="panel-head"><h2>{t("lessonFunnel")}</h2></div>
+        <ol className="funnel cols" lang={course.language} dir={course.language === "ar" ? "rtl" : "ltr"}>
+          {lessonCompletion.map((l, i) => (
+            <li key={l.id}>
+              <span className="funnel-label"><b>{i + 1}.</b> {l.title}</span>
+              <span className="bar-cell"><Bar value={(l.done / n) * 100} /><span>{l.done}/{data.students.length}</span></span>
+            </li>
+          ))}
+        </ol>
+        <p className="muted small">{t("funnelHint")}</p>
+      </section>
     </>
+  );
+}
+
+// Upload, preview and remove the video of one saved lesson
+function LessonVideo({ course, lesson, onSaved }) {
+  const { t, errMsg } = useI18n();
+  const input = useRef(null);
+  const [progress, setProgress] = useState(null);
+  const [err, setErr] = useState(null);
+  const video = lesson.video;
+
+  async function send(file) {
+    setErr(null);
+    if (!VIDEO_TYPES.includes(file.type)) return setErr(t("err:Please choose an MP4, WebM or MOV video"));
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) return setErr(t("err:The video is too large (500 MB maximum)"));
+    setProgress(0);
+    try { onSaved(await upload(`/teacher/courses/${course.slug}/lessons/${lesson.id}/video`, file, setProgress)); }
+    catch (e) { setErr(errMsg(e)); }
+    setProgress(null);
+  }
+  async function remove() {
+    if (!confirm(t("removeVideoConfirm"))) return;
+    try { onSaved(await api(`/teacher/courses/${course.slug}/lessons/${lesson.id}/video`, { method: "DELETE" })); }
+    catch (e) { setErr(errMsg(e)); }
+  }
+
+  return (
+    <div className="lesson-video">
+      <VideoPlayer video={video} />
+      <div className="lesson-video-info">
+        <div>
+          <strong>{video ? (video.name || t("demoClip")) : t("noVideo")}</strong>
+          <small className="muted">{video?.size ? formatSize(video.size) : video ? t("demoClipHint") : t("noVideoHint")}</small>
+        </div>
+        <input ref={input} type="file" accept={VIDEO_TYPES.join(",")} hidden onChange={(e) => { const f = e.target.files[0]; e.target.value = ""; if (f) send(f); }} />
+        <button className="btn small" onClick={() => input.current.click()} disabled={progress !== null}><Icon name="plus" size={15} />{video ? t("replaceVideo") : t("uploadVideo")}</button>
+        {video && <button className="btn ghost small" onClick={remove} disabled={progress !== null}><Icon name="trash" size={15} />{t("remove")}</button>}
+      </div>
+      {progress !== null && <div className="upload-progress" role="status"><Bar value={progress * 100} /><span>{t("uploading", { n: Math.round(progress * 100) })}</span></div>}
+      {err && <p className="form-error" role="alert">{err}</p>}
+    </div>
   );
 }
 
@@ -130,6 +192,7 @@ function Editor({ course, isNew, section, onSaved }) {
   const [msg, setMsg] = useState(null);
   const [open, setOpen] = useState(isNew ? "l1" : null);
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
+  const savedLesson = (id) => (isNew ? null : course.lessons.find((l) => l.id === id));
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
@@ -198,6 +261,7 @@ function Editor({ course, isNew, section, onSaved }) {
                   {t(`day_${d}`)}
                 </label>
               ))}
+              <small className="muted">{t("daysHint")}</small>
             </fieldset>
             <label>{t("time")}<input value={draft.time} onChange={(e) => set({ time: e.target.value })} dir="ltr" /></label>
           </div>
@@ -216,28 +280,39 @@ function Editor({ course, isNew, section, onSaved }) {
           <section className="panel">
             <div className="panel-head">
               <h2>{t("lessons")}</h2>
-              <button className="btn ghost small" onClick={() => { const id = nextId("l", draft.lessons); set({ lessons: [...draft.lessons, { id, title: "", minutes: 30, content: "" }] }); setOpen(id); }}><Icon name="plus" size={15} />{t("addLesson")}</button>
+              <button className="btn ghost small" onClick={() => { const id = nextId("l", draft.lessons); set({ lessons: [...draft.lessons, { id, title: "", minutes: 15, free: false, content: "" }] }); setOpen(id); }}><Icon name="plus" size={15} />{t("addLesson")}</button>
             </div>
+            <p className="muted small">{t("lessonsHint")}</p>
             <ol className="edit-list">
-              {draft.lessons.map((l, i) => (
-                <li key={l.id} className={open === l.id ? "open" : ""}>
-                  <div className="edit-row">
-                    <span className="syl-n">{i + 1}</span>
-                    <input className="grow" value={l.title} dir={dir} placeholder={t("lessonTitle")} aria-label={t("lessonTitle")} onChange={(e) => setLesson(i, { title: e.target.value })} />
-                    <label className="mins"><input type="number" min="1" value={l.minutes} onChange={(e) => setLesson(i, { minutes: e.target.value })} aria-label={t("minutes")} />min</label>
-                    <button className="icon-btn" onClick={() => setOpen(open === l.id ? null : l.id)} aria-label={t("editContent")} title={t("editContent")}><Icon name="edit" size={16} /></button>
-                    <button className="icon-btn" disabled={i === 0} onClick={() => set({ lessons: move(draft.lessons, i, -1) })} aria-label={t("moveUp")}><Icon name="up" size={16} /></button>
-                    <button className="icon-btn" disabled={i === draft.lessons.length - 1} onClick={() => set({ lessons: move(draft.lessons, i, 1) })} aria-label={t("moveDown")}><Icon name="down" size={16} /></button>
-                    <button className="icon-btn danger" disabled={draft.lessons.length === 1} onClick={() => set({ lessons: draft.lessons.filter((_, k) => k !== i) })} aria-label={t("remove")}><Icon name="trash" size={16} /></button>
-                  </div>
-                  {open === l.id && (
-                    <label className="content-edit">{t("lessonContent")}
-                      <textarea rows="9" dir={dir} value={l.content} onChange={(e) => setLesson(i, { content: e.target.value })} />
-                      <small className="muted">{t("markdownHint")}</small>
-                    </label>
-                  )}
-                </li>
-              ))}
+              {draft.lessons.map((l, i) => {
+                const saved = savedLesson(l.id);
+                return (
+                  <li key={l.id} className={open === l.id ? "open" : ""}>
+                    <div className="edit-row">
+                      <span className="syl-n">{i + 1}</span>
+                      <input className="grow" value={l.title} dir={dir} placeholder={t("lessonTitle")} aria-label={t("lessonTitle")} onChange={(e) => setLesson(i, { title: e.target.value })} />
+                      <span className={`video-state ${saved?.video ? "has" : ""}`} title={saved?.video ? t("hasVideo") : t("noVideo")}><Icon name="play" size={13} /></span>
+                      <label className="free-toggle" title={t("freeHint")}><input type="checkbox" checked={l.free} onChange={(e) => setLesson(i, { free: e.target.checked })} />{t("free")}</label>
+                      <label className="mins"><input type="number" min="1" value={l.minutes} onChange={(e) => setLesson(i, { minutes: e.target.value })} aria-label={t("minutes")} />min</label>
+                      <button className="icon-btn" onClick={() => setOpen(open === l.id ? null : l.id)} aria-label={t("editContent")} title={t("editContent")} aria-expanded={open === l.id}><Icon name="edit" size={16} /></button>
+                      <button className="icon-btn" disabled={i === 0} onClick={() => set({ lessons: move(draft.lessons, i, -1) })} aria-label={t("moveUp")}><Icon name="up" size={16} /></button>
+                      <button className="icon-btn" disabled={i === draft.lessons.length - 1} onClick={() => set({ lessons: move(draft.lessons, i, 1) })} aria-label={t("moveDown")}><Icon name="down" size={16} /></button>
+                      <button className="icon-btn danger" disabled={draft.lessons.length === 1} onClick={() => set({ lessons: draft.lessons.filter((_, k) => k !== i) })} aria-label={t("remove")}><Icon name="trash" size={16} /></button>
+                    </div>
+                    {open === l.id && (
+                      <div className="lesson-edit">
+                        {saved
+                          ? <LessonVideo course={course} lesson={saved} onSaved={onSaved} />
+                          : <p className="notice muted"><Icon name="play" size={16} />{t("saveBeforeVideo")}</p>}
+                        <label className="content-edit">{t("lessonContent")}
+                          <textarea rows="7" dir={dir} value={l.content} onChange={(e) => setLesson(i, { content: e.target.value })} />
+                          <small className="muted">{t("markdownHint")}</small>
+                        </label>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ol>
           </section>
 

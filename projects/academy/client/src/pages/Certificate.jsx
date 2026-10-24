@@ -57,7 +57,7 @@ function VerifyForm() {
   const navigate = useNavigate();
   return (
     <form className="verify-form" onSubmit={(e) => { e.preventDefault(); if (code.trim()) navigate(`/certificate/${code.trim().toUpperCase()}`); }}>
-      <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="CA-XXXXXXX" dir="ltr" aria-label={t("certCode")} />
+      <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="AY-XXXXXXX" dir="ltr" aria-label={t("certCode")} />
       <button className="btn">{t("verify")}</button>
     </form>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
-import { Bar, ErrorState, Loading, Markdown, ProgressRing } from "../components/ui.jsx";
+import { Bar, ErrorState, Loading, Markdown, ProgressRing, VideoPlayer } from "../components/ui.jsx";
 import { api, useApi } from "../api/index.js";
 import { useI18n } from "../i18n.jsx";
 
@@ -36,7 +36,7 @@ export default function Learn() {
             return (
               <li key={l.id}>
                 <Link to={`/learn/${slug}/${l.id}`} className={`${l.id === lessonId ? "current" : ""} ${done ? "done" : ""}`} aria-current={l.id === lessonId ? "page" : undefined}>
-                  <span className="ll-mark">{done ? <Icon name="check" size={14} stroke={3} /> : i + 1}</span>
+                  <span className="ll-mark">{done ? <Icon name="check" size={14} stroke={3} /> : l.locked ? <Icon name="lock" size={12} /> : i + 1}</span>
                   <span className="ll-title">{l.title}</span>
                   <span className="ll-min">{l.minutes}′</span>
                 </Link>
@@ -58,6 +58,7 @@ export default function Learn() {
 
       <section className="learn-main">
         <button className="btn ghost small learn-menu" onClick={() => setMenu((m) => !m)} aria-expanded={menu}><Icon name="menu" size={16} />{t("syllabus")}</button>
+        {!enrollment.paid && <PaymentBanner course={course} />}
         {lessonId === "quiz"
           ? <Quiz key={slug} course={course} enrollment={enrollment} onResult={setData} contentDir={contentDir} />
           : <Lesson key={lessonId} course={course} enrollment={enrollment} lessonId={lessonId} onUpdate={setData} contentDir={contentDir} />}
@@ -77,6 +78,7 @@ function Lesson({ course, enrollment, lessonId, onUpdate, contentDir }) {
   const prev = course.lessons[index - 1];
   const next = course.lessons[index + 1];
   const done = enrollment.completed.includes(lesson.id);
+  if (lesson.locked) return <Locked course={course} title={lesson.title} eyebrow={t("lessonN", { n: index + 1, total: course.lessons.length })} contentDir={contentDir} />;
 
   async function toggle(markDone, goNext) {
     setBusy(true); setErr(null);
@@ -94,6 +96,8 @@ function Lesson({ course, enrollment, lessonId, onUpdate, contentDir }) {
         <span className="eyebrow">{t("lessonN", { n: index + 1, total: course.lessons.length })} · {lesson.minutes} min</span>
         <h1 lang={course.language} dir={contentDir}>{lesson.title}</h1>
       </div>
+      <VideoPlayer video={lesson.video} />
+      <h2 className="notes-title">{t("lessonNotes")}</h2>
       <div lang={course.language} dir={contentDir}><Markdown text={lesson.content} /></div>
 
       <div className="lesson-actions">
@@ -118,6 +122,39 @@ function Lesson({ course, enrollment, lessonId, onUpdate, contentDir }) {
   );
 }
 
+function PaymentBanner({ course }) {
+  const { t, money } = useI18n();
+  return (
+    <div className="notice pay">
+      <Icon name="lock" />
+      <span><strong>{t("pendingTitle")}</strong> {t("pendingText", { price: money(course.priceDA) })}</span>
+    </div>
+  );
+}
+
+// A lesson or quiz that opens after payment
+function Locked({ course, title, eyebrow, contentDir }) {
+  const { t, money } = useI18n();
+  return (
+    <article className="lesson">
+      <div className="lesson-head">
+        <span className="eyebrow">{eyebrow}</span>
+        <h1 lang={course.language} dir={contentDir}>{title}</h1>
+      </div>
+      <div className="locked-panel">
+        <span className="cat-icon big"><Icon name="lock" size={28} /></span>
+        <h2>{t("lockedTitle")}</h2>
+        <p>{t("lockedText", { price: money(course.priceDA) })}</p>
+        <ul className="pay-ways">
+          <li><Icon name="pin" size={18} /><div><strong>{t("payAtelier")}</strong><small>{t("payAtelierText")}</small></div></li>
+          <li><Icon name="mail" size={18} /><div><strong>{t("payCcp")}</strong><small>{t("payCcpText")}</small></div></li>
+        </ul>
+        <Link to={`/learn/${course.slug}/${course.lessons.find((l) => !l.locked)?.id}`} className="btn ghost"><Icon name="play" />{t("watchFree")}</Link>
+      </div>
+    </article>
+  );
+}
+
 function Quiz({ course, enrollment, onResult, contentDir }) {
   const { t, errMsg } = useI18n();
   const [answers, setAnswers] = useState({});
@@ -126,6 +163,7 @@ function Quiz({ course, enrollment, onResult, contentDir }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
   const { questions, passMark } = course.quiz;
+  if (course.quiz.locked) return <Locked course={course} title={t("quizTitle")} eyebrow={t("quiz")} contentDir={contentDir} />;
   const missing = questions.length - Object.keys(answers).length;
 
   async function submit(e) {

@@ -42,7 +42,7 @@ function DemoBar() {
         <span className="demo-actions">
           <button className={user?.role === "student" ? "on" : ""} onClick={() => demoLogin("student")}><Icon name="user" size={14} />{t("tryStudent")}</button>
           <button className={user?.role === "teacher" ? "on" : ""} onClick={() => demoLogin("teacher")}><Icon name="chart" size={14} />{t("tryTeacher")}</button>
-          <button onClick={() => { if (confirm(t("resetConfirm"))) { resetDemo(); logout(); navigate("/"); window.location.reload(); } }}><Icon name="refresh" size={14} />{t("resetDemo")}</button>
+          <button onClick={async () => { if (confirm(t("resetConfirm"))) { await resetDemo(); logout(); navigate("/"); window.location.reload(); } }}><Icon name="refresh" size={14} />{t("resetDemo")}</button>
         </span>
       </div>
     </div>
@@ -60,7 +60,7 @@ function Header() {
   return (
     <header className="header">
       <div className="container header-inner">
-        <Link to="/" className="brand" aria-label="Cirta Academy"><Logo /></Link>
+        <Link to="/" className="brand" aria-label="Atelier Yasmina"><Logo /></Link>
         <nav className={`nav ${open ? "open" : ""}`} aria-label={t("mainNav")}>
           <NavLink to="/courses">{t("navCourses")}</NavLink>
           <NavLink to="/verify">{t("navVerify")}</NavLink>
@@ -105,7 +105,7 @@ function Footer() {
           <p><Icon name="clock" size={15} /> {t("footerHours")}</p>
         </div>
       </div>
-      <div className="container footer-bottom">© 2026 Cirta Academy · {t("footerNote")}</div>
+      <div className="container footer-bottom">© 2026 Atelier Yasmina ·{t("footerNote")}</div>
     </footer>
   );
 }

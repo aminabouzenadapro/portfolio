@@ -1,19 +1,18 @@
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import CourseCard from "../components/CourseCard.jsx";
-import { CourseCover, ErrorState, Loading, ProgressRing } from "../components/ui.jsx";
+import { Avatar, ErrorState, Loading, ProgressRing } from "../components/ui.jsx";
 import { useApi } from "../api/index.js";
 import { useI18n } from "../i18n.jsx";
 import { CATEGORIES } from "../../../shared/courses.js";
 
-const CAT_ICON = { dev: "monitor", lang: "globe", office: "layers", business: "chart", school: "book" };
+const CAT_ICON = { basics: "play", patterns: "edit", traditional: "award", alterations: "refresh" };
 
 export default function Home() {
-  const { t, tr, num } = useI18n();
+  const { t, num } = useI18n();
   const { data: courses, error, loading, reload } = useApi("/courses");
   const students = courses?.reduce((s, c) => s + c.students, 0) ?? 0;
-  const teachers = new Set(courses?.map((c) => c.teacher.name)).size;
-  const sample = courses?.find((c) => c.slug === "web-dev") ?? courses?.[0];
+  const videos = courses?.reduce((s, c) => s + c.lessons.filter((l) => l.hasVideo).length, 0) ?? 0;
 
   return (
     <>
@@ -25,7 +24,7 @@ export default function Home() {
             <p className="lead">{t("heroLead")}</p>
             <div className="hero-cta">
               <Link to="/courses" className="btn big">{t("heroBrowse")}<Icon name="arrow" className="flip" /></Link>
-              <Link to="/verify" className="btn big ghost"><Icon name="shield" />{t("navVerify")}</Link>
+              <Link to="/courses/bases-couture" className="btn big ghost"><Icon name="play" />{t("heroFree")}</Link>
             </div>
             <ul className="hero-points">
               <li><Icon name="check" size={16} />{t("heroPoint1")}</li>
@@ -34,45 +33,56 @@ export default function Home() {
             </ul>
           </div>
 
-          {/* A preview of the student space, built from real course data */}
-          {sample && (
-            <div className="hero-visual" aria-hidden="true">
-              <div className="hv-card hv-course">
-                <CourseCover course={sample} />
-                <div>
-                  <small>{t(`cat_${sample.category}`)}</small>
-                  <strong>{tr(sample.title)}</strong>
-                  <span className="hv-lessons"><Icon name="book" size={14} />{t("lessonsCount", { n: sample.lessons.length })}</span>
-                </div>
-              </div>
-              <div className="hv-card hv-progress">
-                <ProgressRing value={67} size={64} />
-                <div><small>{t("yourProgress")}</small><strong>{t("lessonsDone", { done: 4, total: 6 })}</strong></div>
-              </div>
-              <div className="hv-card hv-cert">
-                <Icon name="award" size={26} />
-                <div><small>{t("certificate")}</small><strong>CA-1X7Q2KD</strong></div>
-              </div>
+          {/* A lesson playing, as students see it */}
+          <div className="hero-visual" aria-hidden="true">
+            <div className="hv-video">
+              <video src="media/sew-seam.mp4" poster="media/sew-seam.jpg" autoPlay muted loop playsInline />
+              <div className="hv-video-bar"><span className="hv-dot" />{t("heroVideoCaption")}</div>
             </div>
-          )}
+            <div className="hv-card hv-progress">
+              <ProgressRing value={67} size={60} />
+              <div><small>{t("yourProgress")}</small><strong>{t("lessonsDone", { done: 4, total: 6 })}</strong></div>
+            </div>
+            <div className="hv-card hv-cert">
+              <Icon name="award" size={26} />
+              <div><small>{t("certificate")}</small><strong>AY-0K7Q2PD</strong></div>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="stats-strip">
         <div className="container stats-inner">
           <div><strong>{courses ? num(courses.length) : "–"}</strong><span>{t("statCourses")}</span></div>
-          <div><strong>{courses ? num(teachers) : "–"}</strong><span>{t("statTeachers")}</span></div>
+          <div><strong>{courses ? num(videos) : "–"}</strong><span>{t("statVideos")}</span></div>
           <div><strong>{courses ? num(students) : "–"}</strong><span>{t("statStudents")}</span></div>
-          <div><strong>3</strong><span>{t("statLanguages")}</span></div>
+          <div><strong>15</strong><span>{t("statYears")}</span></div>
         </div>
       </section>
 
       <section className="section">
-        <div className="container">
-          <div className="section-head">
-            <h2>{t("categoriesTitle")}</h2>
+        <div className="container teacher-intro">
+          <div className="teacher-portrait">
+            <Avatar name="Yasmina Hamidi" size={120} />
+            <span className="teacher-badge"><Icon name="award" size={16} />{t("teacherBadge")}</span>
           </div>
-          <div className="cat-grid">
+          <div>
+            <span className="eyebrow">{t("meetEyebrow")}</span>
+            <h2>{t("meetTitle")}</h2>
+            <p className="lead">{t("meetText")}</p>
+            <ul className="hero-points">
+              <li><Icon name="play" size={16} />{t("meetPoint1")}</li>
+              <li><Icon name="users" size={16} />{t("meetPoint2")}</li>
+              <li><Icon name="pin" size={16} />{t("meetPoint3")}</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="section alt">
+        <div className="container">
+          <div className="section-head"><h2>{t("categoriesTitle")}</h2></div>
+          <div className="cat-grid four">
             {CATEGORIES.map((c) => (
               <Link key={c} to={`/courses?category=${c}`} className="cat-tile">
                 <span className="cat-icon"><Icon name={CAT_ICON[c]} size={22} /></span>
@@ -84,7 +94,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section alt">
+      <section className="section">
         <div className="container">
           <div className="section-head">
             <h2>{t("upcomingTitle")}</h2>
@@ -96,11 +106,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section alt">
         <div className="container">
           <div className="section-head"><h2>{t("howTitle")}</h2></div>
-          <ol className="steps">
-            {[1, 2, 3].map((n) => (
+          <ol className="steps four">
+            {[1, 2, 3, 4].map((n) => (
               <li key={n}>
                 <span className="step-n">{n}</span>
                 <h3>{t(`how${n}Title`)}</h3>

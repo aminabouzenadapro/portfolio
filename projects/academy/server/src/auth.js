@@ -9,6 +9,16 @@ export class HttpError extends Error {
 
 export const signToken = (user) => jwt.sign({ sub: String(user._id), role: user.role }, SECRET(), { expiresIn: "7d" });
 
+// <video> tags can't send an Authorization header, so uploaded videos are served
+// through short-lived links that name one file
+export const signMediaToken = (file, sub) => jwt.sign({ file, sub, kind: "media" }, SECRET(), { expiresIn: "6h" });
+export function verifyMediaToken(token, file) {
+  try {
+    const p = jwt.verify(String(token || ""), SECRET());
+    return p.kind === "media" && p.file === file;
+  } catch { return false; }
+}
+
 export const publicUser = (u) => ({ id: String(u._id), name: u.name, email: u.email, role: u.role, title: u.title?.fr ? u.title : undefined });
 
 // Requires a valid "Authorization: Bearer <token>" header, optionally with a given role

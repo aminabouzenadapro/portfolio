@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { mockFetch } from "./mock.js";
+import { mockFetch, mockUpload } from "./mock.js";
 
 // Talks to the Node.js API when VITE_API_URL is set (e.g. http://localhost:4000/api),
 // otherwise to the in-browser demo API, which answers the same routes with the same JSON.
@@ -29,6 +29,32 @@ export async function api(path, { method = "GET", body } = {}) {
   }
   if (status >= 400) throw new ApiError(status, data?.error || "Error");
   return data;
+}
+
+// Sends a video file (multipart, field "video") and reports progress from 0 to 1
+export function upload(path, file, onProgress = () => {}) {
+  if (DEMO) {
+    return mockUpload(path, file, onProgress, tokenStore.get()).then(({ status, data }) => {
+      if (status >= 400) throw new ApiError(status, data?.error || "Error");
+      return data;
+    });
+  }
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", API_URL + path);
+    const token = tokenStore.get();
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText); } catch { /* not JSON */ }
+      xhr.status >= 400 ? reject(new ApiError(xhr.status, data.error || "Error")) : resolve(data);
+    };
+    xhr.onerror = () => reject(new ApiError(0, "Network error"));
+    const form = new FormData();
+    form.append("video", file);
+    xhr.send(form);
+  });
 }
 
 // Loads `path` and reloads when it changes. `data` keeps the last value while reloading.

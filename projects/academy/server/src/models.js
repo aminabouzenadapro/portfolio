@@ -11,7 +11,8 @@ const UserSchema = new Schema({
   title: i18n,
 }, { timestamps: true });
 
-const LessonSchema = new Schema({ id: String, title: String, minutes: Number, content: String }, { _id: false });
+// `video` is a demo clip { src, poster, credit } or an upload { upload, name, size, type }
+const LessonSchema = new Schema({ id: String, title: String, minutes: Number, free: Boolean, video: Schema.Types.Mixed, content: String }, { _id: false });
 const QuestionSchema = new Schema({ id: String, q: String, options: [String], answer: Number, explain: String }, { _id: false });
 
 const CourseSchema = new Schema({
@@ -41,6 +42,8 @@ const EnrollmentSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   course: { type: Schema.Types.ObjectId, ref: "Course", required: true, index: true },
   enrolledAt: { type: Date, default: Date.now },
+  paid: { type: Boolean, default: false },
+  paidAt: { type: Date, default: null },
   completed: [String],
   quizAttempts: [AttemptSchema],
   lastActivity: { type: Date, default: Date.now },

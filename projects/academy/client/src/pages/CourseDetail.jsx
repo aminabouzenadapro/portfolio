@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
-import { Avatar, Bar, CourseCover, ErrorState, Loading, useSchedule } from "../components/ui.jsx";
+import { Avatar, Bar, CourseCover, ErrorState, Loading, VideoPlayer, useSchedule } from "../components/ui.jsx";
 import { api, useApi } from "../api/index.js";
 import { useAuth } from "../auth.jsx";
 import { useI18n } from "../i18n.jsx";
@@ -23,6 +23,7 @@ export default function CourseDetail() {
   if (loading || !course) return <div className="container page"><Loading /></div>;
 
   const totalMinutes = course.lessons.reduce((s, l) => s + l.minutes, 0);
+  const preview = course.lessons.find((l) => l.free && l.video);
   const taken = course.seats - course.seatsLeft;
 
   async function enroll() {
@@ -56,6 +57,16 @@ export default function CourseDetail() {
 
       <div className="container course-layout">
         <div className="course-main">
+          {preview && (
+            <section className="panel">
+              <div className="panel-head">
+                <h2>{t("freePreview")}</h2>
+                <span className="free-chip">{t("free")}</span>
+              </div>
+              <p className="muted preview-title" lang={course.language} dir={course.language === "ar" ? "rtl" : "ltr"}>{preview.title} · {preview.minutes} min</p>
+              <VideoPlayer video={preview.video} />
+            </section>
+          )}
           <section className="panel">
             <h2>{t("youWillLearn")}</h2>
             <ul className="outcomes" lang={course.language} dir={course.language === "ar" ? "rtl" : "ltr"}>
@@ -72,9 +83,9 @@ export default function CourseDetail() {
               {course.lessons.map((l, i) => (
                 <li key={l.id}>
                   <span className="syl-n">{i + 1}</span>
-                  <span className="syl-title">{l.title}</span>
+                  <span className="syl-title">{l.title}{l.free && <span className="free-chip">{t("free")}</span>}</span>
                   <span className="syl-min">{l.minutes} min</span>
-                  <Icon name={enrolled ? "play" : "lock"} size={15} />
+                  <Icon name={l.free || mine.data?.enrollment.paid ? "play" : "lock"} size={15} />
                 </li>
               ))}
               <li className="syl-quiz">
@@ -98,6 +109,7 @@ export default function CourseDetail() {
               <li><Icon name="pin" />{t(`format_${course.format}`)}</li>
               <li><Icon name="globe" />{t("taughtInLang", { lang: t(`langName_${course.language}`) })}</li>
             </ul>
+            <p className="pay-note"><Icon name="shield" size={16} />{t("payNote")}</p>
             <div className="seats">
               <div className="seats-row"><span>{t("seatsTaken", { n: taken, total: course.seats })}</span><strong>{course.seatsLeft ? t("seatsLeft", { n: course.seatsLeft }) : t("full")}</strong></div>
               <Bar value={(taken / course.seats) * 100} color={course.seatsLeft <= 5 ? "var(--warn)" : undefined} />

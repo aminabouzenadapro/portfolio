@@ -1,8 +1,11 @@
 // Domain rules shared by the Node.js API and the in-browser demo API,
-// so grading, progress and certificates behave the same in both.
+// so payment, grading, progress and certificates behave the same in both.
 
 export const AT_RISK_DAYS = 10;
 const DAY = 24 * 60 * 60 * 1000;
+
+// A lesson is open when the student has paid, or when it is a free preview
+export const canOpen = (lesson, enrollment) => Boolean(lesson.free || enrollment?.paid);
 
 // Grades a quiz. `answers` maps question id -> chosen option index.
 export function gradeQuiz(quiz, answers = {}) {
@@ -28,35 +31,40 @@ export function bestScore(enrollment) {
   return attempts.length ? Math.max(...attempts.map((a) => a.percent)) : null;
 }
 
-// A certificate needs every lesson done and a passing quiz score
+// An attestation needs payment, every lesson done and a passing quiz score
 export function canCertify(course, enrollment) {
   const best = bestScore(enrollment);
-  return progress(course, enrollment).percent === 100 && best !== null && best >= course.quiz.passMark;
+  return Boolean(enrollment?.paid) && progress(course, enrollment).percent === 100 && best !== null && best >= course.quiz.passMark;
 }
 
-// Short, stable code printed on the certificate and checked on the public verify page
+// Short, stable code printed on the attestation and checked on the public verify page
 export function certificateCode(email, courseSlug) {
   let h = 2166136261;
   for (const ch of `${email}:${courseSlug}`) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
-  return "CA-" + (h >>> 0).toString(36).toUpperCase().padStart(7, "0");
+  return "AY-" + (h >>> 0).toString(36).toUpperCase().padStart(7, "0");
 }
 
-// completed | on-track | at-risk (no activity for AT_RISK_DAYS days and not finished)
+// completed | pending (not paid yet) | at-risk (no activity for AT_RISK_DAYS days) | on-track
 export function studentStatus(course, enrollment, now = Date.now()) {
   if (enrollment.certificate) return "completed";
+  if (!enrollment.paid) return "pending";
   const idle = (now - new Date(enrollment.lastActivity || enrollment.enrolledAt).getTime()) / DAY;
   return idle >= AT_RISK_DAYS ? "at-risk" : "on-track";
 }
 
 export function courseStats(course, enrollments, now = Date.now()) {
   const n = enrollments.length;
-  const scores = enrollments.map(bestScore).filter((s) => s !== null);
+  const paid = enrollments.filter((e) => e.paid);
+  const scores = paid.map(bestScore).filter((s) => s !== null);
   const avg = (xs) => (xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : null);
   return {
     students: n,
-    avgProgress: avg(enrollments.map((e) => progress(course, e).percent)) ?? 0,
+    paid: paid.length,
+    pending: n - paid.length,
+    revenue: paid.length * course.priceDA,
+    avgProgress: avg(paid.map((e) => progress(course, e).percent)) ?? 0,
     avgScore: avg(scores),
-    completionRate: n ? Math.round((enrollments.filter((e) => e.certificate).length / n) * 100) : 0,
+    completionRate: paid.length ? Math.round((paid.filter((e) => e.certificate).length / paid.length) * 100) : 0,
     atRisk: enrollments.filter((e) => studentStatus(course, e, now) === "at-risk").length,
   };
 }
@@ -71,21 +79,33 @@ export function weeklyEnrollments(enrollments, weeks = 8, now = Date.now()) {
   return counts;
 }
 
-// What anyone can see: no lesson content, no quiz answers
-export function publicCourse(course) {
+// Videos are either demo clips ({ src }) or teacher uploads ({ upload }). Each side
+// turns an upload into a playable link: a signed URL on the server, a local blob in the demo.
+const keepVideo = (v) => v;
+
+// What anyone can see: lesson titles, the free preview videos, no notes and no quiz answers
+export function publicCourse(course, resolveVideo = keepVideo) {
   const { lessons, quiz, ...rest } = course;
   return {
     ...rest,
-    lessons: lessons.map(({ id, title, minutes }) => ({ id, title, minutes })),
+    lessons: lessons.map(({ id, title, minutes, free, video }) => ({
+      id, title, minutes, free: Boolean(free), hasVideo: Boolean(video),
+      ...(free && video ? { video: resolveVideo(video) } : {}),
+    })),
     quiz: { passMark: quiz.passMark, count: quiz.questions.length },
   };
 }
 
-// What an enrolled student sees: full lessons, quiz without the answers
-export function studentCourse(course) {
+// What an enrolled student sees: open lessons in full, locked ones as titles only, quiz without answers
+export function studentCourse(course, enrollment, resolveVideo = keepVideo) {
   return {
     ...course,
-    quiz: { passMark: course.quiz.passMark, questions: course.quiz.questions.map(({ id, q, options }) => ({ id, q, options })) },
+    lessons: course.lessons.map((l) => (canOpen(l, enrollment)
+      ? { ...l, free: Boolean(l.free), video: l.video ? resolveVideo(l.video) : null, locked: false }
+      : { id: l.id, title: l.title, minutes: l.minutes, free: false, hasVideo: Boolean(l.video), locked: true })),
+    quiz: enrollment?.paid
+      ? { passMark: course.quiz.passMark, questions: course.quiz.questions.map(({ id, q, options }) => ({ id, q, options })) }
+      : { passMark: course.quiz.passMark, questions: [], locked: true, count: course.quiz.questions.length },
   };
 }
 
@@ -112,3 +132,7 @@ export function validateCourse(c) {
 export function slugify(s) {
   return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48) || "course";
 }
+
+// Upload rules, checked by the server and the demo
+export const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+export const MAX_VIDEO_MB = 500;

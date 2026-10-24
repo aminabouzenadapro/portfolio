@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import { Avatar, Bar, ErrorState, Loading } from "../components/ui.jsx";
-import { useApi } from "../api/index.js";
+import { api, useApi } from "../api/index.js";
 import { useAuth } from "../auth.jsx";
 import { useI18n } from "../i18n.jsx";
 
@@ -34,31 +35,60 @@ function WeeklyChart({ weeks }) {
 }
 
 export default function Teacher() {
-  const { t, tr, ago } = useI18n();
+  const { t, tr, ago, money, errMsg } = useI18n();
   const { user } = useAuth();
   const { data, error, loading, reload } = useApi("/teacher/overview");
+  const [busy, setBusy] = useState(null);
+  const [actionError, setActionError] = useState(null);
 
   if (error) return <div className="container page"><ErrorState error={error} onRetry={reload} /></div>;
   if (loading && !data) return <div className="container page"><Loading /></div>;
-  const { totals, weekly, courses, atRisk, recentQuizzes } = data;
+  const { totals, weekly, courses, pendingPayments, atRisk, recentQuizzes } = data;
+
+  async function markPaid(s) {
+    setBusy(s.email + s.course.slug); setActionError(null);
+    try {
+      await api(`/teacher/courses/${s.course.slug}/students/${encodeURIComponent(s.email)}`, { method: "PATCH", body: { paid: true } });
+      await reload();
+    } catch (e) { setActionError(errMsg(e)); }
+    setBusy(null);
+  }
 
   return (
     <div className="container page">
       <div className="page-head row">
         <div>
           <h1>{t("teacherTitle")}</h1>
-          <p>{t("teacherLead", { name: user.name })}</p>
+          <p>{t("teacherLead", { name: user.name.split(" ")[0] })}</p>
         </div>
         <Link to="/teacher/new" className="btn"><Icon name="plus" />{t("newCourse")}</Link>
       </div>
 
       <div className="kpis five">
         <div className="kpi"><Icon name="users" /><strong>{totals.students}</strong><span>{t("kpiStudents")}</span></div>
+        <div className="kpi"><Icon name="chart" /><strong>{money(totals.revenue)}</strong><span>{t("kpiRevenue")}</span></div>
+        <div className={`kpi ${totals.pending ? "warn" : ""}`}><Icon name="clock" /><strong>{money(totals.pendingAmount)}</strong><span>{t("kpiPending", { n: totals.pending })}</span></div>
         <div className="kpi"><Icon name="book" /><strong>{totals.avgProgress}%</strong><span>{t("kpiAvgProgress")}</span></div>
-        <div className="kpi"><Icon name="quiz" /><strong>{totals.avgScore === null ? "–" : `${totals.avgScore}%`}</strong><span>{t("kpiAvgScore")}</span></div>
         <div className="kpi"><Icon name="award" /><strong>{totals.certificates}</strong><span>{t("kpiCertificates")}</span></div>
-        <div className={`kpi ${totals.atRisk ? "warn" : ""}`}><Icon name="alert" /><strong>{totals.atRisk}</strong><span>{t("kpiAtRisk")}</span></div>
       </div>
+
+      <section className="panel">
+        <div className="panel-head"><h2>{t("pendingPaymentsTitle")}</h2><span className="muted small">{t("pendingPaymentsHint")}</span></div>
+        {actionError && <p className="form-error" role="alert">{actionError}</p>}
+        {pendingPayments.length ? (
+          <ul className="risk-list pay-list">
+            {pendingPayments.map((s) => (
+              <li key={s.email + s.course.slug}>
+                <Avatar name={s.name} size={36} />
+                <div><strong>{s.name}</strong><small>{tr(s.course.title)}</small></div>
+                <span className="muted small">{t("enrolledWhen", { when: ago(s.enrolledAt) })}</span>
+                <strong className="amount">{money(s.course.priceDA)}</strong>
+                <button className="btn small" onClick={() => markPaid(s)} disabled={busy === s.email + s.course.slug}><Icon name="check" size={15} />{t("markPaid")}</button>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="muted">{t("noPending")}</p>}
+      </section>
 
       <div className="dash-grid">
         <section className="panel">
@@ -86,16 +116,16 @@ export default function Teacher() {
         <div className="panel-head"><h2>{t("myCoursesTeacher")}</h2></div>
         <div className="table-wrap">
           <table className="table">
-            <thead><tr><th>{t("course")}</th><th>{t("kpiStudents")}</th><th>{t("kpiAvgProgress")}</th><th>{t("kpiAvgScore")}</th><th>{t("completion")}</th><th>{t("kpiAtRisk")}</th><th /></tr></thead>
+            <thead><tr><th>{t("course")}</th><th>{t("kpiStudents")}</th><th>{t("kpiRevenue")}</th><th>{t("kpiAvgProgress")}</th><th>{t("kpiAvgScore")}</th><th>{t("completion")}</th><th /></tr></thead>
             <tbody>
               {courses.map((c) => (
                 <tr key={c.slug}>
                   <td><span className="swatch" style={{ background: c.color }} /><Link to={`/teacher/course/${c.slug}`}>{tr(c.title)}</Link></td>
-                  <td>{c.stats.students}</td>
+                  <td>{c.stats.students}{c.stats.pending > 0 && <span className="pill status-pending">{t("pendingShort", { n: c.stats.pending })}</span>}</td>
+                  <td>{money(c.stats.revenue)}</td>
                   <td><div className="bar-cell"><Bar value={c.stats.avgProgress} /><span>{c.stats.avgProgress}%</span></div></td>
                   <td>{c.stats.avgScore === null ? "–" : `${c.stats.avgScore}%`}</td>
                   <td>{c.stats.completionRate}%</td>
-                  <td>{c.stats.atRisk ? <span className="pill status-at-risk">{c.stats.atRisk}</span> : "0"}</td>
                   <td><Link to={`/teacher/course/${c.slug}`} className="btn ghost small">{t("manage")}</Link></td>
                 </tr>
               ))}
